@@ -8,7 +8,7 @@ class InitialState:
         # Read google docs for naming convention
         self.sub_1 = []
         self.sub_2 = []
-        self.Np = 100
+        self.Np = 1000
         self.h = 0.1
         self.time = 0.0
         self.tEnd = 0.4
@@ -89,7 +89,7 @@ class InitialState:
     def estimate_next_position(self):
 
         # Check if whether the time has reached to an end
-        if self.time != self.tEnd:
+        while self.time < self.tEnd:
             
             self.time += 0.1
             # Here, we calculate the next position of each particle in further time step, h
@@ -117,8 +117,9 @@ class InitialState:
             elif self.time == 0.2:
                 row, col = 1, 0
 
-            elif self.time == 0.3:
+            elif self.time < 0.4:
                 row, col = 1, 1
+
             # Plots the new coordinate of substance 1 and substance 2
             self.plot(self.sub_1, row, col)
             self.plot(self.sub_2, row, col)
@@ -137,9 +138,9 @@ class InitialState:
             self.axes[row,col].scatter(particle_list[i][0], particle_list[i][1], s=5, c=color)
 
     def main(self):
-        self.taskB_initial_state()
+        self.taskA_initial_state()
         self.estimate_next_position()
-        self.estimate_next_position()
+        #self.estimate_next_position()
         #self.estimate_next_position()
         plt.show()
 
