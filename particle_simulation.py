@@ -8,21 +8,28 @@ class InitialState:
         # Read google docs for naming convention
         self.sub_1 = []
         self.sub_2 = []
-        self.Np = 1000
+        self.Np = 100
         self.h = 0.1
         self.time = 0.0
-        self.tEnd = 0.3
+        self.tEnd = 0.4
         self.D = 0.1
-        self.lang = np.random.normal(loc=0, scale=1, size=self.Np)
+        
+        # Figure used in graph
         self.figure, self.axes = plt.subplots(nrows=2, ncols=2)
         self.circle = plt.Circle((0,0), 1, alpha=0.5)
         self.circle1 = plt.Circle((0,0), 1, alpha=0.5)
+
+        # Generates uniformly distributed data
+        self.x = np.random.uniform(low=0,high=2,size=self.Np)
+        self.y = np.random.uniform(low=0,high=2,size=self.Np)
+
+        self.lang = np.random.normal(loc=0, scale=1, size=self.Np)
 
     # Calculate the next position of the particle using euler's method
     def euler(self,a,i):
         return a + 2*np.sqrt(2*self.D) * np.sqrt(self.h) * self.lang[i]
 
-    # Creates the initial state
+    # Creates the initial state for task A
     def taskA_initial_state(self):
 
         plt.xlim([-10,10])
@@ -30,11 +37,8 @@ class InitialState:
 
         #x = np.random.normal(loc=0, scale=1, size=self.data_len)
         #y = np.random.normal(loc=0, scale=1, size=self.data_len)
-        x = np.random.uniform(low=0,high=3,size=self.Np)
-        y = np.random.uniform(low=0,high=3,size=self.Np)
-
-        isInside = np.sqrt(x**2 + y**2) <= 1
-        isOutside = np.sqrt(x**2 + y**2) > 1
+        
+        isInside = np.sqrt(self.x**2 + self.y**2) <= 1
 
         plt.xlim(-1,1)
         plt.ylim(-1,1)
@@ -43,31 +47,24 @@ class InitialState:
         for i in range(self.Np):
             
             # If the position of the particle is within a circle of radius 1 centred at the origin, add the particle as substance 1
-            if x[i] ** 2 + y[i]**2 <= 1:
-                self.sub_1.append((x[i], y[i]))
+            if self.x[i] ** 2 + self.y[i]**2 <= 1:
+                self.sub_1.append((self.x[i], self.y[i]))
 
             # Vice versa
             else:
-                self.sub_2.append((x[i], y[i]))
+                self.sub_2.append((self.x[i], self.y[i]))
 
         # Conditional statement to assign the position of the particle in the grid
-        self.axes[0,0].scatter(x[~isInside], y[~isInside],s=5, c="blue")
-        self.axes[0,0].scatter(x[isInside], y[isInside],s=5, c="red")
+        self.axes[0,0].scatter(self.x[~isInside], self.y[~isInside],s=5, c="blue")
+        self.axes[0,0].scatter(self.x[isInside], self.y[isInside],s=5, c="red")
         #self.axes[0,0].add_patch(self.circle)
 
         self.figure.tight_layout()
-        
 
-        self.next_step()
-
-        plt.show()
-
+    # Creates the initial state for task B
     def taskB_initial_state(self):
 
-        x = np.random.uniform(low=0,high=2,size=self.Np)
-        y = np.random.uniform(low=0,high=2,size=self.Np)
-
-        toTheLeft = x <= 1
+        toTheLeft = self.x <= 1
 
         plt.xlim(-1,1)
         plt.ylim(-1,1)
@@ -76,29 +73,25 @@ class InitialState:
         for i in range(self.Np):
             
             # If the position of the particle is within a circle of radius 1 centred at the origin, add the particle as substance 1
-            if x[i] <= 1:
-                self.sub_1.append((x[i], y[i]))
+            if self.x[i] <= 1:
+                self.sub_1.append((self.x[i], self.y[i]))
 
             # Vice versa
             else:
-                self.sub_2.append((x[i], y[i]))
+                self.sub_2.append((self.x[i], self.y[i]))
 
         # Conditional statement to assign the position of the particle in the grid
-        self.axes[0,0].scatter(x[toTheLeft], y[toTheLeft],s=5, c="red")
-        self.axes[0,0].scatter(x[~toTheLeft], y[~toTheLeft],s=5, c="blue")
-    
+        self.axes[0,0].scatter(self.x[toTheLeft], self.y[toTheLeft],s=5, c="red")
+        self.axes[0,0].scatter(self.x[~toTheLeft], self.y[~toTheLeft],s=5, c="blue")
+
         self.figure.tight_layout()
-    
-        self.next_step()
 
-        plt.show()
-
-
-    def next_step(self):
+    def estimate_next_position(self):
 
         # Check if whether the time has reached to an end
         if self.time != self.tEnd:
             
+            self.time += 0.1
             # Here, we calculate the next position of each particle in further time step, h
             for i, particle in enumerate(self.sub_1):
                 
@@ -118,14 +111,21 @@ class InitialState:
 
                 self.sub_2[i] = (next_pos_x, next_pos_y)
 
+            if self.time == 0.1:
+                row, col = 0, 1
+
+            elif self.time == 0.2:
+                row, col = 1, 0
+
+            elif self.time == 0.3:
+                row, col = 1, 1
             # Plots the new coordinate of substance 1 and substance 2
-            self.plot(self.sub_1)
-            self.plot(self.sub_2)
+            self.plot(self.sub_1, row, col)
+            self.plot(self.sub_2, row, col)
 
-            # Increment the time
-            self.time += 0.1
 
-    def plot(self, particle_list):
+
+    def plot(self, particle_list,row,col):
 
         if particle_list == self.sub_1:
             color = "red"
@@ -134,12 +134,17 @@ class InitialState:
             color="blue"
 
         for i, particle in enumerate(particle_list):
-            self.axes[0,1].scatter(particle_list[i][0], particle_list[i][1], s=5, c=color)
+            self.axes[row,col].scatter(particle_list[i][0], particle_list[i][1], s=5, c=color)
 
-
+    def main(self):
+        self.taskB_initial_state()
+        self.estimate_next_position()
+        self.estimate_next_position()
+        #self.estimate_next_position()
+        plt.show()
 
 state = InitialState()
-state.taskB_initial_state()
+state.main()
 
 
 
