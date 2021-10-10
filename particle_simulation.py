@@ -8,12 +8,15 @@ class InitialState:
         # Read google docs for naming convention
         self.sub_1 = []
         self.sub_2 = []
-        self.Np = 6024
+        self.Np = 3000
         self.h = 0.1
         self.time = 0.0
         self.tEnd = 0.3
         self.D = 0.1
         self.lang = np.random.normal(loc=0, scale=1, size=self.Np)
+        self.figure, self.axes = plt.subplots(nrows=2, ncols=2)
+        self.circle = plt.Circle((0,0), 1, alpha=0.5)
+        self.circle1 = plt.Circle((0,0), 1, alpha=0.5)
 
     # Calculate the next position of the particle using euler's method
     def euler(self,a,i):
@@ -21,8 +24,6 @@ class InitialState:
 
     # Creates the initial state
     def initial_state(self):
-
-        figure, axes = plt.subplots(nrows=2, ncols=2)
 
         plt.xlim([-10,10])
         plt.ylim([-10,10])
@@ -34,9 +35,6 @@ class InitialState:
 
         isInside = np.sqrt(x**2 + y**2) <= 1
         isOutside = np.sqrt(x**2 + y**2) > 1
-
-        circle = plt.Circle((0,0), 1, alpha=0.5)
-        circle1 = plt.Circle((0,0), 1, alpha=0.5)
 
         plt.xlim(-1,1)
         plt.ylim(-1,1)
@@ -53,11 +51,17 @@ class InitialState:
                 self.sub_2.append((x[i], y[i]))
 
         # Conditional statement to assign the position of the particle in the grid
-        axes[0,0].scatter(x[~isInside], y[~isInside],s=5, c="blue")
-        axes[0,0].scatter(x[isInside], y[isInside],s=5, c="red")
-        axes[0,0].add_patch(circle)
+        self.axes[0,0].scatter(x[~isInside], y[~isInside],s=5, c="blue")
+        self.axes[0,0].scatter(x[isInside], y[isInside],s=5, c="red")
+        #self.axes[0,0].add_patch(self.circle)
 
-        figure.tight_layout()
+        self.figure.tight_layout()
+
+        self.next_step()
+
+        plt.show()
+
+    def next_step(self):
 
         # Check if whether the time has reached to an end
         if self.time != self.tEnd:
@@ -82,14 +86,12 @@ class InitialState:
                 self.sub_2[i] = (next_pos_x, next_pos_y)
             
             # Plots the new coordinate of substance 1 and substance 2
-            axes[0,1].scatter(*zip(*self.sub_1),s=5, c="red")
-            axes[0,1].scatter(*zip(*self.sub_2),s=5, c="blue")
-            axes[0,1].add_patch(circle1)
+            self.axes[0,1].scatter(*zip(*self.sub_1),s=5, c="red")
+            self.axes[0,1].scatter(*zip(*self.sub_2),s=5, c="blue")
+            #self.axes[0,1].add_patch(self.circle1)
 
             # Increment the time
             self.time += 0.1
-
-        plt.show()
 
 state = InitialState()
 state.initial_state()
