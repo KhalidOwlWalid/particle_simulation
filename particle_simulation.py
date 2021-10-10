@@ -8,7 +8,7 @@ class InitialState:
         # Read google docs for naming convention
         self.sub_1 = []
         self.sub_2 = []
-        self.Np = 1000
+        self.Np = 6024
         self.h = 0.1
         self.time = 0.0
         self.tEnd = 0.3
@@ -53,8 +53,8 @@ class InitialState:
                 self.sub_2.append((x[i], y[i]))
 
         # Conditional statement to assign the position of the particle in the grid
-        axes[0,0].plot(x[isInside], y[isInside], 'ro')
-        axes[0,0].plot(x[~isInside], y[~isInside], 'bo')
+        axes[0,0].scatter(x[~isInside], y[~isInside],s=5, c="blue")
+        axes[0,0].scatter(x[isInside], y[isInside],s=5, c="red")
         axes[0,0].add_patch(circle)
 
         figure.tight_layout()
@@ -82,8 +82,8 @@ class InitialState:
                 self.sub_2[i] = (next_pos_x, next_pos_y)
             
             # Plots the new coordinate of substance 1 and substance 2
-            axes[0,1].plot(*zip(*self.sub_1),'ro')
-            axes[0,1].plot(*zip(*self.sub_2),'bo')
+            axes[0,1].scatter(*zip(*self.sub_1),s=5, c="red")
+            axes[0,1].scatter(*zip(*self.sub_2),s=5, c="blue")
             axes[0,1].add_patch(circle1)
 
             # Increment the time
