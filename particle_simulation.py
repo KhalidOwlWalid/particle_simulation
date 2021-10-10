@@ -8,7 +8,7 @@ class InitialState:
         # Read google docs for naming convention
         self.sub_1 = []
         self.sub_2 = []
-        self.Np = 3000
+        self.Np = 1000
         self.h = 0.1
         self.time = 0.0
         self.tEnd = 0.3
@@ -23,7 +23,7 @@ class InitialState:
         return a + 2*np.sqrt(2*self.D) * np.sqrt(self.h) * self.lang[i]
 
     # Creates the initial state
-    def initial_state(self):
+    def taskA_initial_state(self):
 
         plt.xlim([-10,10])
         plt.ylim([-10,10])
@@ -56,10 +56,43 @@ class InitialState:
         #self.axes[0,0].add_patch(self.circle)
 
         self.figure.tight_layout()
+        
 
         self.next_step()
 
         plt.show()
+
+    def taskB_initial_state(self):
+
+        x = np.random.uniform(low=0,high=2,size=self.Np)
+        y = np.random.uniform(low=0,high=2,size=self.Np)
+
+        toTheLeft = x <= 1
+
+        plt.xlim(-1,1)
+        plt.ylim(-1,1)
+
+        # Divide the particles into their substance type
+        for i in range(self.Np):
+            
+            # If the position of the particle is within a circle of radius 1 centred at the origin, add the particle as substance 1
+            if x[i] <= 1:
+                self.sub_1.append((x[i], y[i]))
+
+            # Vice versa
+            else:
+                self.sub_2.append((x[i], y[i]))
+
+        # Conditional statement to assign the position of the particle in the grid
+        self.axes[0,0].scatter(x[toTheLeft], y[toTheLeft],s=5, c="red")
+        self.axes[0,0].scatter(x[~toTheLeft], y[~toTheLeft],s=5, c="blue")
+    
+        self.figure.tight_layout()
+    
+        self.next_step()
+
+        plt.show()
+
 
     def next_step(self):
 
@@ -84,17 +117,29 @@ class InitialState:
                 next_pos_y = self.euler(y,i)
 
                 self.sub_2[i] = (next_pos_x, next_pos_y)
-            
+
             # Plots the new coordinate of substance 1 and substance 2
-            self.axes[0,1].scatter(*zip(*self.sub_1),s=5, c="red")
-            self.axes[0,1].scatter(*zip(*self.sub_2),s=5, c="blue")
-            #self.axes[0,1].add_patch(self.circle1)
+            self.plot(self.sub_1)
+            self.plot(self.sub_2)
 
             # Increment the time
             self.time += 0.1
 
+    def plot(self, particle_list):
+
+        if particle_list == self.sub_1:
+            color = "red"
+
+        elif particle_list == self.sub_2:
+            color="blue"
+
+        for i, particle in enumerate(particle_list):
+            self.axes[0,1].scatter(particle_list[i][0], particle_list[i][1], s=5, c=color)
+
+
+
 state = InitialState()
-state.initial_state()
+state.taskB_initial_state()
 
 
 
