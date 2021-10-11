@@ -108,6 +108,7 @@ class InitialState:
             # Same thing as above
             for i, particle in enumerate(self.sub_2):
                 
+                # Add a comment
                 x, y = particle[0], particle[1]
                 next_pos_x = self.euler(x,i)
                 next_pos_y = self.euler(y,i)
