@@ -8,7 +8,7 @@ class InitialState:
         # Read google docs for naming convention
         self.sub_1 = []
         self.sub_2 = []
-        self.Np = 1000
+        self.Np = 5000
         self.h = 0.1
         self.time = 0.0
         self.tEnd = 0.4
@@ -25,18 +25,19 @@ class InitialState:
 
         self.lang = np.random.normal(loc=0, scale=1, size=self.Np)
 
+        self.subplot_position = {"(0,1)":[(0,1)],
+                                 "(1,0)":[(1,0)],
+                                 "(1,1)":[(1,1)]
+                                 }
+
+        self.subplots = ["(0,1)","(1,0)","(1,1)"]
+
     # Calculate the next position of the particle using euler's method
-    def euler(self,a,i):
-        return a + 2*np.sqrt(2*self.D) * np.sqrt(self.h) * self.lang[i]
+    def euler(self,coordinate,i):
+        return coordinate + 2*np.sqrt(2*self.D) * np.sqrt(self.h) * self.lang[i]
 
     # Creates the initial state for task A
     def taskA_initial_state(self):
-
-        plt.xlim([-10,10])
-        plt.ylim([-10,10])
-
-        #x = np.random.normal(loc=0, scale=1, size=self.data_len)
-        #y = np.random.normal(loc=0, scale=1, size=self.data_len)
         
         isInside = np.sqrt(self.x**2 + self.y**2) <= 1
 
@@ -88,10 +89,12 @@ class InitialState:
 
     def estimate_next_position(self):
 
-        # Check if whether the time has reached to an end
-        while self.time < self.tEnd:
-            
+        for i, subplot in enumerate(self.subplots):
+
+            row, col = self.subplot_position[subplot][0][0],self.subplot_position[subplot][0][1]
+
             self.time += 0.1
+
             # Here, we calculate the next position of each particle in further time step, h
             for i, particle in enumerate(self.sub_1):
                 
@@ -101,7 +104,7 @@ class InitialState:
 
                 # Reassign the current particle from substance 1 (in this case), to a new position
                 self.sub_1[i] = (next_pos_x, next_pos_y)
-            
+     
             # Same thing as above
             for i, particle in enumerate(self.sub_2):
                 
@@ -111,22 +114,14 @@ class InitialState:
 
                 self.sub_2[i] = (next_pos_x, next_pos_y)
 
-            if self.time == 0.1:
-                row, col = 0, 1
-
-            elif self.time == 0.2:
-                row, col = 1, 0
-
-            elif self.time < 0.4:
-                row, col = 1, 1
-
             # Plots the new coordinate of substance 1 and substance 2
             self.plot(self.sub_1, row, col)
             self.plot(self.sub_2, row, col)
 
-
-
     def plot(self, particle_list,row,col):
+        
+        plt.xlim(-1,1)
+        plt.ylim(-1,1)
 
         if particle_list == self.sub_1:
             color = "red"
@@ -138,7 +133,7 @@ class InitialState:
             self.axes[row,col].scatter(particle_list[i][0], particle_list[i][1], s=5, c=color)
 
     def main(self):
-        self.taskA_initial_state()
+        self.taskB_initial_state()
         self.estimate_next_position()
         #self.estimate_next_position()
         #self.estimate_next_position()
