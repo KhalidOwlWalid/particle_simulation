@@ -20,8 +20,8 @@ class InitialState:
         self.circle1 = plt.Circle((0,0), 1, alpha=0.5)
 
         # Generates uniformly distributed data
-        self.x = np.random.uniform(low=0,high=2,size=self.Np)
-        self.y = np.random.uniform(low=0,high=2,size=self.Np)
+        self.x = np.random.uniform(low=-1,high=1,size=self.Np)
+        self.y = np.random.uniform(low=-1,high=1,size=self.Np)
 
         self.lang = np.random.normal(loc=0, scale=1, size=self.Np)
 
@@ -65,7 +65,7 @@ class InitialState:
     # Creates the initial state for task B
     def taskB_initial_state(self):
 
-        toTheLeft = self.x <= 1
+        toTheLeft = self.x <= 0
 
         plt.xlim(-1,1)
         plt.ylim(-1,1)
@@ -74,7 +74,7 @@ class InitialState:
         for i in range(self.Np):
             
             # If the position of the particle is within a circle of radius 1 centred at the origin, add the particle as substance 1
-            if self.x[i] <= 1:
+            if self.x[i] <= 0:
                 self.sub_1.append((self.x[i], self.y[i]))
 
             # Vice versa
@@ -114,14 +114,13 @@ class InitialState:
 
                 self.sub_2[i] = (next_pos_x, next_pos_y)
 
+            plt.xlim(-1,1)
+            plt.ylim(-1,1)
             # Plots the new coordinate of substance 1 and substance 2
             self.plot(self.sub_1, row, col)
             self.plot(self.sub_2, row, col)
 
     def plot(self, particle_list,row,col):
-        
-        plt.xlim(-1,1)
-        plt.ylim(-1,1)
 
         if particle_list == self.sub_1:
             color = "red"
