@@ -139,6 +139,7 @@ class InitialState:
         #self.estimate_next_position()
         plt.show()
 
+# Test
 state = InitialState()
 state.main()
 
