@@ -8,7 +8,7 @@ class InitialState:
         # Read google docs for naming convention
         self.sub_1 = []
         self.sub_2 = []
-        self.Np = 1000
+        self.Np = 10000
         self.h = 0.1
         self.time = 0.0
         self.tEnd = 0.4
@@ -20,6 +20,7 @@ class InitialState:
         self.figure, self.axes = plt.subplots(nrows=2, ncols=2)
         self.circle = plt.Circle((0,0), 1, alpha=0.5)
         self.circle1 = plt.Circle((0,0), 1, alpha=0.5)
+        self.size = 2
 
         # Generates uniformly distributed data
         self.x = np.random.uniform(low=-1,high=1,size=self.Np)
@@ -33,17 +34,6 @@ class InitialState:
                                  }
 
         self.subplots = ["(0,1)","(1,0)","(1,1)"]
-
-    # Calculate the next position of the particle using euler's method
-    def euler(self,coordinate,i, random):
-        sqrt_d = np.sqrt(2*self.D)
-        sqrt_h = np.sqrt(self.h)
-        print("coordinate:", coordinate)
-        print("random: ", random)
-        print("sqrt_d:", sqrt_d)
-        print("sqrt_h:", sqrt_h)
-        
-        return coordinate + 2*sqrt_d * sqrt_h * random
 
     # Creates the initial state for task A
     def taskA_initial_state(self):
@@ -65,8 +55,10 @@ class InitialState:
                 self.sub_2.append((self.x[i], self.y[i]))
                 
         # Conditional statement to assign the position of the particle in the grid
-        self.axes[0,0].scatter(self.x[~isInside], self.y[~isInside],s=5, c="blue")
-        self.axes[0,0].scatter(self.x[isInside], self.y[isInside],s=5, c="red")
+        self.axes[0,0].scatter(self.x[~isInside], self.y[~isInside],s=self.size, c="blue")
+        self.axes[0,0].scatter(self.x[isInside], self.y[isInside],s=self.size, c="red")
+
+        # Creates a circle patch centred at the origin 
         #self.axes[0,0].add_patch(self.circle)
 
         self.figure.tight_layout()
@@ -88,91 +80,62 @@ class InitialState:
                 self.sub_2.append((self.x[i], self.y[i]))
 
         # Conditional statement to assign the position of the particle in the grid
-        self.axes[0,0].scatter(self.x[toTheLeft], self.y[toTheLeft],s=5, c="red")
-        self.axes[0,0].scatter(self.x[~toTheLeft], self.y[~toTheLeft],s=5, c="blue")
+        self.axes[0,0].scatter(self.x[toTheLeft], self.y[toTheLeft],s=self.size, c="red")
+        self.axes[0,0].scatter(self.x[~toTheLeft], self.y[~toTheLeft],s=self.size, c="blue")
 
         self.figure.tight_layout()
 
+    def boundary_conditions(self, next_pos_x, next_pos_y):
+
+        if next_pos_x > 1:
+            distanceFromMax = next_pos_x - 1
+            next_pos_x = next_pos_x - 2 * distanceFromMax
+
+        elif next_pos_x < -1:
+            distanceFromMax = next_pos_x + 1
+            next_pos_x = next_pos_x - 2 * distanceFromMax
+
+        if next_pos_y > 1:
+            distanceFromMax = next_pos_y - 1
+            next_pos_y = next_pos_y - 2 * distanceFromMax
+
+        elif next_pos_y < -1:
+            distanceFromMax = next_pos_y + 1
+            next_pos_y = next_pos_y - 2 * distanceFromMax
+
+    def calculation(self,particles):
+
+        for i, particle in enumerate(particles):
+
+            lang = np.random.normal(loc=0, scale=1, size=2)
+            
+            x, y = particle[0], particle[1]
+
+            # Euler's equation using lambda function
+            euler = lambda coordinate, random : coordinate + 2 * np.sqrt(2 * self.D) * np.sqrt(self.h) * random
+            next_pos_x = euler(x, lang[0])
+            next_pos_y = euler(y, lang[1])
+
+            # Creates a "wall" to avoid the particles from moving to places it shouldnt
+            self.boundary_conditions(next_pos_x, next_pos_y)
+
+            # Reassign the current particle from substance 1 (in this case), to a new position
+            particles[i] = (next_pos_x, next_pos_y)
+
+
     def estimate_next_position(self):
 
-        for i, subplot in enumerate(self.subplots):
+        type = [self.sub_1, self.sub_2]
 
-            #print("Substance 1: ", self.sub_1)
-            #print("Substance 2: ", self.sub_2)
+        for i, subplot in enumerate(self.subplots):
 
             row, col = self.subplot_position[subplot][0][0],self.subplot_position[subplot][0][1]
 
             self.time += 0.1
 
-            # Here, we calculate the next position of each particle in further time step, h
-            for i, particle in enumerate(self.sub_1):
-
-                lang = np.random.normal(loc=0, scale=1, size=2)
-                
-                x, y = particle[0], particle[1]
-                euler = lambda coordinate, random : coordinate + 2 * np.sqrt(2 * self.D) * np.sqrt(self.h) * random
-                next_pos_x = euler(x, lang[0])
-                next_pos_y = euler(y, lang[1])
-
-                if next_pos_x > 1:
-                    distanceFromMax = next_pos_x - 1
-                    next_pos_x = next_pos_x - 2 * distanceFromMax
-
-                elif next_pos_x < -1:
-                    distanceFromMax = next_pos_x + 1
-                    next_pos_x = next_pos_x + 2 * distanceFromMax
-
-                if next_pos_y > 1:
-                    distanceFromMax = next_pos_y - 1
-                    next_pos_x = next_pos_y - 2 * distanceFromMax
-
-                elif next_pos_y < -1:
-                    distanceFromMax = next_pos_y + 1
-                    next_pos_x = next_pos_y + 2 * distanceFromMax
-                #next_pos_x = x + self.euler(x,i,lang[0])
-                #next_pos_y = y + self.euler(y,i, lang[1])
-
-                # Reassign the current particle from substance 1 (in this case), to a new position
-                self.sub_1[i] = (next_pos_x, next_pos_y)
-
-            # Same thing as above
-            for i, particle in enumerate(self.sub_2):
-                
-                lang = np.random.normal(loc=0, scale=1, size=2)
-                
-                x, y = particle[0], particle[1]
-                euler = lambda coordinate, random : coordinate + 2 * np.sqrt(2 * self.D) * np.sqrt(self.h) * random
-                next_pos_x = euler(x, lang[0])
-                next_pos_y =euler(y, lang[1])
-                #next_pos_x = x + self.euler(x,i,lang[0])
-                #next_pos_y = y + self.euler(y,i, lang[1])
-
-                if next_pos_x > 1:
-                    distanceFromMax = next_pos_x - 1
-                    next_pos_x = next_pos_x - 2 * distanceFromMax
-
-                elif next_pos_x < -1:
-                    distanceFromMax = next_pos_x + 1
-                    next_pos_x = next_pos_x + 2 * distanceFromMax
-
-                if next_pos_y > 1:
-                    distanceFromMax = next_pos_y - 1
-                    next_pos_x = next_pos_y - 2 * distanceFromMax
-
-                elif next_pos_y < -1:
-                    distanceFromMax = next_pos_y + 1
-                    next_pos_x = next_pos_y + 2 * distanceFromMax
-
-                self.sub_2[i] = (next_pos_x, next_pos_y)
-                
-            # Plots the new coordinate of substance 1 and substance 2
-            self.plot(self.sub_1, row, col)
-            self.plot(self.sub_2, row, col)
-
-        out_particle = self.check_particle()
-
-        print("Inside particle: {calc}".format(calc=(self.Np - len(out_particle))))
-            
+            for particle_type in type:
+                self.calculation(particle_type)
+                self.plot(particle_type, row, col)
 
     def plot(self, particle_list,row,col):
 
@@ -187,8 +150,9 @@ class InitialState:
             self.axes[row,col].set_xlim(xmin=self.lower_lim, xmax=self.upper_lim)
             self.axes[row,col].set_ybound(lower=self.lower_lim, upper=self.upper_lim)
             self.axes[row,col].set_ylim(ymin=self.lower_lim, ymax=self.upper_lim)
-            self.axes[row,col].scatter(particle_list[i][0], particle_list[i][1], s=3, c=color)
+            self.axes[row,col].scatter(particle_list[i][0], particle_list[i][1], s=self.size, c=color)
 
+    # Not important as of now
     def check_particle(self):
 
         out_particle = []
@@ -197,7 +161,10 @@ class InitialState:
             
             x, y = particle[0], particle[1]
 
-            if x > 0 or y > 0 or x < -1 or y < -1: 
+            if x > 0 or x < -1: 
+                out_particle.append(particle)
+
+            elif y > 0 or x < -1:
                 out_particle.append(particle)
 
         for i, particle in enumerate(self.sub_2):
@@ -222,7 +189,7 @@ class InitialState:
         plt.show()
 
 state = InitialState()
-state.call_out_taskA()
+state.call_out_taskB()
 
 
 
