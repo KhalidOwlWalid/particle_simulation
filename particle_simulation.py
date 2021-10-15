@@ -5,7 +5,7 @@ class InitialState:
     
     def __init__(self):
 
-        # Read google docs for naming convention
+        # Important constant 
         self.sub_1 = []
         self.sub_2 = []
         self.Np = 10000
@@ -15,6 +15,8 @@ class InitialState:
         self.D = 0.1
         self.lower_lim = -1
         self.upper_lim = 1
+        self.Nx = 64
+        self.Ny = 64
         
         # Figure used in graph
         self.figure, self.axes = plt.subplots(nrows=2, ncols=2)
@@ -26,6 +28,7 @@ class InitialState:
         self.x = np.random.uniform(low=-1,high=1,size=self.Np)
         self.y = np.random.uniform(low=-1,high=1,size=self.Np)
 
+        # For plots
         self.subplot_position = {"(0,1)":[(0,1)],
                                  "(1,0)":[(1,0)],
                                  "(1,1)":[(1,1)]
@@ -34,6 +37,8 @@ class InitialState:
                                  }
 
         self.subplots = ["(0,1)","(1,0)","(1,1)"]
+        self.fig = plt.gcf()
+        self.fig.set_size_inches(18.5,10.5, forward=True)
 
     # Creates the initial state for task A
     def taskA_initial_state(self):
@@ -152,6 +157,7 @@ class InitialState:
             self.axes[row,col].set_ylim(ymin=self.lower_lim, ymax=self.upper_lim)
             self.axes[row,col].scatter(particle_list[i][0], particle_list[i][1], s=self.size, c=color)
 
+
     # Not important as of now
     def check_particle(self):
 
@@ -176,32 +182,18 @@ class InitialState:
 
         return out_particle
 
-
+    def call_out_taskA(self):
+        self.taskA_initial_state()
+        self.estimate_next_position()
+        self.figure.savefig('result/task_A.png')
+        plt.show()
 
     def call_out_taskB(self):
         self.taskB_initial_state()
         self.estimate_next_position()
+        self.figure.savefig('result/task_B.png')
         plt.show()
 
-    def call_out_taskA(self):
-        self.taskA_initial_state()
-        self.estimate_next_position()
-        plt.show()
 
 state = InitialState()
-state.call_out_taskB()
-
-
-
-
-
-
-
-        
-
-
-    
-
-
-    
-
+state.call_out_taskA()
