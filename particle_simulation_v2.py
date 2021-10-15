@@ -188,4 +188,4 @@ class InitialState:
 
 
 state = InitialState()
-state.call_out_taskA()
+state.single_plot()
