@@ -8,18 +8,19 @@ class InitialState:
         # Important constant 
         self.sub_1 = []
         self.sub_2 = []
-        self.Np = 5000
+        self.Np = 1000
         self.h = 0.1
         self.time = 0.0
         self.tEnd = 0.4
         self.D = 0.1
         self.lower_lim = -1
         self.upper_lim = 1
-        self.Nx = 64
-        self.Ny = 64
+        self.Nx = 5
+        self.Ny = 5
         
         # Figure used in graph
         self.figure, self.axes = plt.subplots(nrows=2, ncols=2)
+        self.figure1, self.axes1 = plt.subplots()
         self.circle = plt.Circle((0,0), 1, alpha=0.5)
         self.circle1 = plt.Circle((0,0), 1, alpha=0.5)
         self.size = 2
@@ -110,6 +111,8 @@ class InitialState:
             distanceFromMax = next_pos_y + 1
             next_pos_y = next_pos_y - 2 * distanceFromMax
 
+        return next_pos_x, next_pos_y
+
     def calculation(self,particles, time_step):
 
         for i, particle in enumerate(particles):
@@ -124,7 +127,7 @@ class InitialState:
             next_pos_y = euler(y, lang[1])
 
             # Creates a "wall" to avoid the particles from moving to places it shouldnt
-            self.boundary_conditions(next_pos_x, next_pos_y)
+            next_pos_x, next_pos_y = self.boundary_conditions(next_pos_x, next_pos_y)
 
             # Reassign the current particle from substance 1 (in this case), to a new position
             particles[i] = (next_pos_x, next_pos_y)
@@ -157,23 +160,6 @@ class InitialState:
             self.axes[row,col].set_ylim(ymin=self.lower_lim, ymax=self.upper_lim)
             self.axes[row,col].scatter(particle_list[i][0], particle_list[i][1], s=self.size, c=color)
 
-    def single_plot(self):
-
-        self.taskA_initial_state()
-
-        for i in range(7):
-            for type in self.type:
-                self.calculation(type, self.h)
-
-        for particle_list in self.type:
-            self.plot(particle_list, 0,0)
-
-        self.axes[0,0].set_yticks(np.linspace(-1,1,self.Ny), minor=True)
-        self.axes[0,0].yaxis.grid(True, which='minor')
-        self.axes[0,0].set_xticks(np.linspace(-1,1,self.Nx), minor=True)
-        self.axes[0,0].xaxis.grid(True, which='minor')
-        plt.show()
-
     def call_out_taskA(self):
         self.taskA_initial_state()
         self.estimate_next_position()
@@ -186,6 +172,92 @@ class InitialState:
         self.figure.savefig('result/task_B.png')
         plt.show()
 
+class ConcentrationPlot(InitialState):
 
-state = InitialState()
-state.call_out_taskA()
+    def __init__(self):
+        super().__init__()
+
+        self.x_grid = np.linspace(-1,1,self.Nx)
+        self.y_grid = np.linspace(-1,1,self.Ny)
+
+        self.column = self.Nx
+        self.row = self.Ny
+
+    def single_plot(self):
+
+        self.taskA_initial_state()
+
+        for i in range(7):
+            for type in self.type:
+                self.calculation(type, self.h)
+
+        for particle_list in self.type:
+
+            if particle_list == self.sub_1:
+                color = "red"
+
+            elif particle_list == self.sub_2:
+                color="blue"
+
+
+            for i, particle in enumerate(particle_list):
+                self.axes1.set_xbound(lower=self.lower_lim, upper=self.upper_lim)
+                self.axes1.set_xlim(xmin=self.lower_lim, xmax=self.upper_lim)
+                self.axes1.set_ybound(lower=self.lower_lim, upper=self.upper_lim)
+                self.axes1.set_ylim(ymin=self.lower_lim, ymax=self.upper_lim)
+                self.axes1.scatter(particle[0], particle[1], s=self.size, c=color)
+
+        self.axes1.set_yticks(np.linspace(-1,1,self.Ny), minor=True)
+        self.axes1.yaxis.grid(True,linestyle='--', which='minor')
+        self.axes1.set_xticks(np.linspace(-1,1,self.Nx), minor=True)
+        self.axes1.xaxis.grid(True, linestyle='--', which='minor')
+
+
+
+    def calculate_concentration(self):
+        
+        # Populate a "grid" with zeros
+        grid_list = []
+        n_sub_1 = 0
+
+        grid_position = lambda x, y, i, j: x > self.x_grid[i] and x < self.x_grid[i+1] and y > self.y_grid[j] and y < self.y_grid[j+1]
+
+        for i in range(4):
+            grid_list.append([0 for j in range(4)])
+
+        for i in range(len(self.x_grid)):
+            for j in range(len(self.y_grid)):
+                
+                for particle in self.sub_1:
+                    # Check corner
+                    if grid_position(particle[0], particle[1], i, j):
+                        n_sub_1 += 1
+
+                for particle in self.sub_2:
+                    
+                    # Check corner
+                    if grid_position(particle[0], particle[1], i, j):
+                        grid_list[i][j] += 1
+
+                try:
+                    grid_list[i][j] = grid_list[i][j]/(grid_list[i][j] + n_sub_1)
+                except:
+                    print("Index out of bound")
+        
+        grid_list = np.array(grid_list)
+        im = self.axes1.imshow(grid_list, cmap='Wistia')
+
+        self.figure1.savefig('diagram/grid_plot.png')
+        
+    def heatmap2d(self,arr: np.ndarray):
+        plt.imshow(arr, cmap='viridis')
+        plt.colorbar()
+        plt.show()
+
+
+
+concentration_plot = ConcentrationPlot()
+
+concentration_plot.single_plot()
+concentration_plot.calculate_concentration()
+plt.show()
