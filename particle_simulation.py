@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import time
 
 class InitialState:
     
@@ -8,7 +9,7 @@ class InitialState:
         # Important constant 
         self.sub_1 = []
         self.sub_2 = []
-        self.Np = 5000
+        self.Np = 30000
         self.h = 0.1
         self.time = 0.0
         self.tEnd = 0.4
@@ -61,8 +62,8 @@ class InitialState:
                 self.sub_2.append((self.x[i], self.y[i]))
                 
         # Conditional statement to assign the position of the particle in the grid
-        #self.axes[0,0].scatter(self.x[~isInside], self.y[~isInside],s=self.size, c="blue")
-        #self.axes[0,0].scatter(self.x[isInside], self.y[isInside],s=self.size, c="red")
+        self.axes[0,0].scatter(self.x[~isInside], self.y[~isInside],s=self.size, c="blue")
+        self.axes[0,0].scatter(self.x[isInside], self.y[isInside],s=self.size, c="red")
 
         # Creates a circle patch centred at the origin 
         #self.axes[0,0].add_patch(self.circle)
@@ -91,7 +92,7 @@ class InitialState:
 
         self.figure.tight_layout()
 
-
+    # Responsiblle in making sure that the particles are within the boundary limits 
     def boundary_conditions(self, next_pos_x, next_pos_y):
 
         if next_pos_x > 1:
@@ -129,19 +130,22 @@ class InitialState:
             # Reassign the current particle from substance 1 (in this case), to a new position
             particles[i] = (next_pos_x, next_pos_y)
 
-
+    # As obvious as the name is, this is to calculate the particle's next position at a time step, h
     def estimate_next_position(self):
 
+        # Plots the particles in each subplots 
         for subplot in self.subplots:
 
             row, col = self.subplot_position[subplot][0][0],self.subplot_position[subplot][0][1]
 
             self.time += 0.1
 
+            # self.type contains self.sub_1 and self.sub_2 which allows us to access each particle type easily
             for particle_type in self.type:
                 self.calculation(particle_type, self.h)
                 self.plot(particle_type, row, col)
 
+    # Plots our particle
     def plot(self, particle_list,row,col):
 
         if particle_list == self.sub_1:
@@ -150,6 +154,7 @@ class InitialState:
         elif particle_list == self.sub_2:
             color="blue"
 
+        # Sets some boundary limits to our plot
         for i, particle in enumerate(particle_list):
             self.axes[row,col].set_xbound(lower=self.lower_lim, upper=self.upper_lim)
             self.axes[row,col].set_xlim(xmin=self.lower_lim, xmax=self.upper_lim)
@@ -157,6 +162,20 @@ class InitialState:
             self.axes[row,col].set_ylim(ymin=self.lower_lim, ymax=self.upper_lim)
             self.axes[row,col].scatter(particle_list[i][0], particle_list[i][1], s=self.size, c=color)
 
+    # This is not important as of now, so you can neglect it at the moment
+    # But if you are interested to know what I am trying to do, this function is to be used to create grids so that we could calculate
+    # the concentration for each grid
+    # Each grid of boxes are defined as shown below depending on the size
+    """
+    [0,0,0,0]
+    [0,0,0,0]
+    [0,0,0,0]
+    [0,0,0,0]
+
+    """
+    # In this case, it is 5 grids of x and 5 grids of y and the 0s represents the boxes
+    # Calculation will take place in each boxes and it will then represent a value set between 0 < concentration < 1
+    # We will then either use a heatmap or a contour plot to plot accordingly to its concentration value
     def single_plot(self):
 
         self.taskA_initial_state()
@@ -177,6 +196,7 @@ class InitialState:
     def call_out_taskA(self):
         self.taskA_initial_state()
         self.estimate_next_position()
+        # Saves it in a file name result, by the name task_A.png
         self.figure.savefig('result/task_A.png')
         plt.show()
 
@@ -188,4 +208,7 @@ class InitialState:
 
 
 state = InitialState()
+start_time = time.time()
 state.call_out_taskA()
+# Calculate the time taken to execute our program
+print("--- %s seconds ---" % (time.time() - start_time))
