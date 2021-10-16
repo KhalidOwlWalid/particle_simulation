@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 class InitialState:
     
@@ -8,15 +9,15 @@ class InitialState:
         # Important constant 
         self.sub_1 = []
         self.sub_2 = []
-        self.Np = 1000
+        self.Np = 10000
         self.h = 0.1
         self.time = 0.0
         self.tEnd = 0.4
         self.D = 0.1
         self.lower_lim = -1
         self.upper_lim = 1
-        self.Nx = 5
-        self.Ny = 5
+        self.Nx = 64
+        self.Ny = 64
         
         # Figure used in graph
         self.figure, self.axes = plt.subplots(nrows=2, ncols=2)
@@ -163,13 +164,13 @@ class InitialState:
     def call_out_taskA(self):
         self.taskA_initial_state()
         self.estimate_next_position()
-        self.figure.savefig('result/task_A.png')
+        self.figure.savefig('diagram/task_A.png')
         plt.show()
 
     def call_out_taskB(self):
         self.taskB_initial_state()
         self.estimate_next_position()
-        self.figure.savefig('result/task_B.png')
+        self.figure.savefig('diagram/task_B.png')
         plt.show()
 
 class ConcentrationPlot(InitialState):
@@ -222,8 +223,8 @@ class ConcentrationPlot(InitialState):
 
         grid_position = lambda x, y, i, j: x > self.x_grid[i] and x < self.x_grid[i+1] and y > self.y_grid[j] and y < self.y_grid[j+1]
 
-        for i in range(4):
-            grid_list.append([0 for j in range(4)])
+        for i in range(self.Nx - 1):
+            grid_list.append([0 for j in range(self.Ny - 1)])
 
         for i in range(len(self.x_grid)):
             for j in range(len(self.y_grid)):
@@ -245,10 +246,11 @@ class ConcentrationPlot(InitialState):
                     print("Index out of bound")
         
         grid_list = np.array(grid_list)
-        im = self.axes1.imshow(grid_list, cmap='Wistia')
+        sns.heatmap(grid_list, cmap='GnBu')
+        print(grid_list)
 
         self.figure1.savefig('diagram/grid_plot.png')
-        
+
     def heatmap2d(self,arr: np.ndarray):
         plt.imshow(arr, cmap='viridis')
         plt.colorbar()
@@ -257,7 +259,10 @@ class ConcentrationPlot(InitialState):
 
 
 concentration_plot = ConcentrationPlot()
+initial_state = InitialState()
 
-concentration_plot.single_plot()
-concentration_plot.calculate_concentration()
+initial_state.call_out_taskA()
 plt.show()
+#concentration_plot.single_plot()
+#concentration_plot.calculate_concentration()
+#plt.show()
