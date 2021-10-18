@@ -71,6 +71,8 @@ class InitialState:
 
         self.figure.tight_layout()
 
+        self.calculate_concentration()
+
     # Creates the initial state for task B
     def taskB_initial_state(self):
 
@@ -188,7 +190,7 @@ class ConcentrationPlot(InitialState):
 
         self.taskA_initial_state()
 
-        for i in range(7):
+        for i in range(4):
             for type in self.type:
                 self.calculation(type, self.h)
 
@@ -214,12 +216,10 @@ class ConcentrationPlot(InitialState):
         self.axes1.xaxis.grid(True, linestyle='--', which='minor')
 
 
-
     def calculate_concentration(self):
         
         # Populate a "grid" with zeros
         grid_list = []
-        n_sub_1 = 0
 
         grid_position = lambda x, y, i, j: x > self.x_grid[i] and x < self.x_grid[i+1] and y > self.y_grid[j] and y < self.y_grid[j+1]
 
@@ -228,6 +228,8 @@ class ConcentrationPlot(InitialState):
 
         for i in range(len(self.x_grid)):
             for j in range(len(self.y_grid)):
+
+                n_sub_1 = 0
                 
                 for particle in self.sub_1:
                     # Check corner
@@ -250,19 +252,20 @@ class ConcentrationPlot(InitialState):
         print(grid_list)
 
         self.figure1.savefig('diagram/grid_plot.png')
+        plt.show()
 
     def heatmap2d(self,arr: np.ndarray):
         plt.imshow(arr, cmap='viridis')
         plt.colorbar()
-        plt.show()
 
 
 
 concentration_plot = ConcentrationPlot()
-initial_state = InitialState()
+#initial_state = InitialState()
+#print(concentration_plot.Np)
+concentration_plot.single_plot()
+concentration_plot.calculate_concentration()
 
-initial_state.call_out_taskA()
-plt.show()
-#concentration_plot.single_plot()
+
 #concentration_plot.calculate_concentration()
 #plt.show()
