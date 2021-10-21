@@ -9,11 +9,12 @@ class InitialState:
         # Important constant 
         self.sub_1 = []
         self.sub_2 = []
-        self.Np = 1000
+        self.Np = 1
         self.h = 0.1
         self.time = 0.0
         self.tEnd = 0.4
-        self.D = 0.1i
+        self.D = 0.1
+        
         self.lower_lim = -1
         self.upper_lim = 1
         self.Nx = 10
@@ -267,6 +268,9 @@ initial_state.call_out_taskA()
 #print(concentration_plot.Np)
 #concentration_plot.single_plot()
 #concentration_plot.calculate_concentration()
+print(initial_state.sub_1)
+print(initial_state.sub_2)
+
 
 
 #concentration_plot.calculate_concentration()
