@@ -9,15 +9,15 @@ class InitialState:
         # Important constant 
         self.sub_1 = []
         self.sub_2 = []
-        self.Np = 10000
+        self.Np = 1000
         self.h = 0.1
         self.time = 0.0
         self.tEnd = 0.4
         self.D = 0.1
         self.lower_lim = -1
         self.upper_lim = 1
-        self.Nx = 64
-        self.Ny = 64
+        self.Nx = 10
+        self.Ny = 10
         
         # Figure used in graph
         self.figure, self.axes = plt.subplots(nrows=2, ncols=2)
@@ -63,15 +63,15 @@ class InitialState:
                 self.sub_2.append((self.x[i], self.y[i]))
                 
         # Conditional statement to assign the position of the particle in the grid
-        #self.axes[0,0].scatter(self.x[~isInside], self.y[~isInside],s=self.size, c="blue")
-        #self.axes[0,0].scatter(self.x[isInside], self.y[isInside],s=self.size, c="red")
+        self.axes[0,0].scatter(self.x[~isInside], self.y[~isInside],s=self.size, c="blue")
+        self.axes[0,0].scatter(self.x[isInside], self.y[isInside],s=self.size, c="red")
 
         # Creates a circle patch centred at the origin 
         #self.axes[0,0].add_patch(self.circle)
 
         self.figure.tight_layout()
 
-        self.calculate_concentration()
+        #self.calculate_concentration()
 
     # Creates the initial state for task B
     def taskB_initial_state(self):
@@ -248,7 +248,8 @@ class ConcentrationPlot(InitialState):
                     print("Index out of bound")
         
         grid_list = np.array(grid_list)
-        sns.heatmap(grid_list, cmap='GnBu')
+        plt.imshow(grid_list, norm=plt.Normalize(0,1), cmap='Wistia')
+        #sns.heatmap(grid_list, cmap='GnBu')
         print(grid_list)
 
         self.figure1.savefig('diagram/grid_plot.png')
@@ -260,12 +261,13 @@ class ConcentrationPlot(InitialState):
 
 
 
-concentration_plot = ConcentrationPlot()
-#initial_state = InitialState()
+#concentration_plot = ConcentrationPlot()
+initial_state = InitialState()
+initial_state.call_out_taskA()
 #print(concentration_plot.Np)
-concentration_plot.single_plot()
-concentration_plot.calculate_concentration()
+#concentration_plot.single_plot()
+#concentration_plot.calculate_concentration()
 
 
 #concentration_plot.calculate_concentration()
-#plt.show()
+plt.show()
