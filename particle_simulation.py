@@ -1,7 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from scipy import interpolate
+import math
 
+global count 
+count = 0
 class InitialState:
     
     def __init__(self):
@@ -9,16 +13,15 @@ class InitialState:
         # Important constant 
         self.sub_1 = []
         self.sub_2 = []
-        self.Np = 1
-        self.h = 0.1
+        self.Np = 3000
+        self.h = 0.025
         self.time = 0.0
         self.tEnd = 0.4
         self.D = 0.1
-        
         self.lower_lim = -1
         self.upper_lim = 1
-        self.Nx = 10
-        self.Ny = 10
+        self.Nx = 20
+        self.Ny = 20
         
         # Figure used in graph
         self.figure, self.axes = plt.subplots(nrows=2, ncols=2)
@@ -43,6 +46,9 @@ class InitialState:
         self.fig = plt.gcf()
         self.fig.set_size_inches(18.5,10.5, forward=True)
         self.type = [self.sub_1, self.sub_2]
+
+        # For vector
+        self.velocity_dict = {}
 
     # Creates the initial state for task A
     def taskA_initial_state(self):
@@ -96,6 +102,7 @@ class InitialState:
 
         self.figure.tight_layout()
 
+        return self.sub_1, self.sub_2
 
     def boundary_conditions(self, next_pos_x, next_pos_y):
 
@@ -117,7 +124,7 @@ class InitialState:
 
         return next_pos_x, next_pos_y
 
-    def calculation(self,particles, time_step):
+    def calculation(self,particles, time_step, type, velocity=0):
 
         for i, particle in enumerate(particles):
 
@@ -125,10 +132,17 @@ class InitialState:
             
             x, y = particle[0], particle[1]
 
-            # Euler's equation using lambda function
-            euler = lambda coordinate, random : coordinate + 2 * np.sqrt(2 * self.D) * np.sqrt(time_step) * random
-            next_pos_x = euler(x, lang[0])
-            next_pos_y = euler(y, lang[1])
+            if type == 1:
+                # Euler's equation using lambda function
+                euler = lambda coordinate, random : coordinate + 2 * np.sqrt(2 * self.D) * np.sqrt(time_step) * random
+                next_pos_x = euler(x, lang[0])
+                next_pos_y = euler(y, lang[1])
+
+            if type == 2:
+                # Euler's equation using lambda function
+                euler = lambda coordinate, random : coordinate + 2 * np.sqrt(2 * self.D) * np.sqrt(time_step) * random + velocity * time_step
+                next_pos_x = euler(x, lang[0])
+                next_pos_y = euler(y, lang[1])
 
             # Creates a "wall" to avoid the particles from moving to places it shouldnt
             next_pos_x, next_pos_y = self.boundary_conditions(next_pos_x, next_pos_y)
@@ -137,7 +151,19 @@ class InitialState:
             particles[i] = (next_pos_x, next_pos_y)
 
 
-    def estimate_next_position(self):
+    def estimate_next_position(self, type=1):
+
+        for subplot in self.subplots:
+
+            row, col = self.subplot_position[subplot][0][0],self.subplot_position[subplot][0][1]
+
+            self.time += 0.1
+
+            for particle_type in self.type:
+                self.calculation(particle_type, self.h, type)
+                self.plot(particle_type, row, col)
+
+    def estimate_next_position1(self):
 
         for subplot in self.subplots:
 
@@ -166,13 +192,13 @@ class InitialState:
 
     def call_out_taskA(self):
         self.taskA_initial_state()
-        self.estimate_next_position()
+        self.estimate_next_position(type=1)
         self.figure.savefig('diagram/task_A.png')
         plt.show()
 
     def call_out_taskB(self):
         self.taskB_initial_state()
-        self.estimate_next_position()
+        self.estimate_next_position(type=1)
         self.figure.savefig('diagram/task_B.png')
         plt.show()
 
@@ -191,9 +217,9 @@ class ConcentrationPlot(InitialState):
 
         self.taskA_initial_state()
 
-        for i in range(4):
-            for type in self.type:
-                self.calculation(type, self.h)
+        #for i in range(1):
+            #for type in self.type:
+                #self.calculation(type, self.h)
 
         for particle_list in self.type:
 
@@ -249,8 +275,8 @@ class ConcentrationPlot(InitialState):
                     print("Index out of bound")
         
         grid_list = np.array(grid_list)
-        plt.imshow(grid_list, norm=plt.Normalize(0,1), cmap='Wistia')
-        #sns.heatmap(grid_list, cmap='GnBu')
+        #plt.imshow(grid_list, norm=plt.Normalize(0,1), cmap='Wistia')
+        sns.heatmap(grid_list, cmap='GnBu')
         print(grid_list)
 
         self.figure1.savefig('diagram/grid_plot.png')
@@ -260,18 +286,269 @@ class ConcentrationPlot(InitialState):
         plt.imshow(arr, cmap='viridis')
         plt.colorbar()
 
+class Interpolated(InitialState):
+
+    def __init__(self):
+        super().__init__()
+
+        self.count = 0
+
+        self.x_interval = np.arange(-1.03125,1.03125,0.0625)
+        self.y_interval = np.arange(-1.03125,1.03125,0.0625)
+
+        self.extracted_data = self.extract_data()
+        self.x_data, self.y_data, self.u_data, self.v_data = self.extract_data_return_list()
+
+    def extract_data(self):
+
+        file=open("data_file/velocityCMM3.dat")
+        data=file.read()
+
+        data = []
+
+        for line in open('data_file/velocityCMM3.dat', 'r'):
+            try:
+                lines = [i for i in line.split()]
+                data.append((float(lines[0]), float(lines[1]), float(lines[2]), float(lines[3])))
+            except:
+                pass
+
+        return data
+
+    def extract_data_return_list(self):
+
+        file=open("data_file/velocityCMM3.dat")
+        data=file.read()
+
+        data = []
+        x, y, u, v = [], [], [], []
+
+        for line in open('data_file/velocityCMM3.dat', 'r'):
+            try:
+                lines = [i for i in line.split()]
+                data.append((float(lines[0]), float(lines[1]), float(lines[2]), float(lines[3])))
+            except:
+                pass
+                
+        for element in data:
+            x.append(element[0])
+            y.append(element[1])
+            u.append(element[2])
+            v.append(element[3])
+
+        return x, y, u, v
+
+    def bilinear_interpolation_using_package(self, x_coordinate, y_coordinate):
+
+        xx = x_coordinate
+        yy = y_coordinate
+        xx, yy = np.meshgrid(xx, yy)
+
+        points = np.transpose(np.vstack((self.x_data, self.y_data)))
+        u_interp = interpolate.griddata(points, self.u_data, (xx, yy), method='linear')
+        v_interp = interpolate.griddata(points, self.v_data, (xx, yy), method='linear')
+
+        return u_interp, v_interp
+
+    
+    def find_nearest_point(self, x, y, x_list, y_list):
+
+        x_points = []
+        y_points = []
+
+        for i, nearest_x in enumerate(x_list):
+
+            if abs(x - nearest_x) < 0.0625:
+                x_points.append(nearest_x)
+
+        for i, nearest_y in enumerate(y_list):
+
+            if abs(y - nearest_y) < 0.0625:
+                y_points.append(nearest_y)
+
+        # Tthe problem with the code is right here
+        # Some of the points will be located at x > 0.9685 or x < -0.9685
+        # This causes an issue as when taking the difference, we only get a single point
+
+        #if len(x_points) < 2 or len(y_points) < 2:
+            #x_points.append(0.96875)
+            #print((x, y))
+            #print(x_points)
+            #print(y_points)
+
+        return x_points, y_points
+
+    def find_corresponding_velocity(self, x_points, y_points, x_pos, y_pos):
+
+        pairs = []
+        velocity = []
+
+        for i in x_points:
+            for j in y_points:
+                pairs.append((i,j))
+
+        condition = lambda x_pos, y_pos : x_pos < 0.96875 or x_pos > 0.96875 or y_pos < 0.96875 or y_pos > 0.96875
+
+        if condition(x_pos, y_pos):
+            u, v = self.bilinear_interpolation_using_package(x_pos, y_pos)
+            x, y = 10, 10
+            velocity.append((x,y,float(u),float(v)))
+
+            return velocity
+
+        for i, coordinate in enumerate(pairs):
+            
+            #if condition(coordinate[0], coordinate[1]) or condition(x_pos, y_pos):
+            if coordinate[0] > 0.96875 or coordinate[0] < -0.96875 or coordinate[1] < -0.96875 or coordinate[1] > 0.96875:
+                    u, v = self.bilinear_interpolation_using_package(x_pos, y_pos)
+                    x, y = None, None
+                    velocity.append((x,y,u,v))
+                    break
+
+            else:
+                for j, points in enumerate(self.extracted_data):
+
+                    if len(pairs) == 4:
+                        if coordinate[0] == points[0] and coordinate[1] == points[1]:
+                            velocity.append(points)
+
+        return velocity
+
+    def calculate_velocity(self,x,y,x1,x2,y1,y2,q11,q12,q21,q22):
+
+        a = np.array([[x2-x ,x-x1]])
+        b = np.array([[q11,q12], [q21, q22]])
+        c = np.array([[y2-y], [y-y1]])
+        denominator = 1/((x2-x1) * (y2-y1))
+
+        A = np.dot(a,b)
+        B = np.dot(A, c)
+        C = denominator * B
+
+        return C
+
+    def interpolate_velocity(self,x,y,nearest_velocity):
+
+        velocity_type = ["x", "y"]
+
+        try:
+            for type in velocity_type:
+                
+                if type == "x":
+
+                    if nearest_velocity[0][1] == None:
+                        u = 0
+
+                    else:
+                        x1, y1, q11 = nearest_velocity[0][0], nearest_velocity[0][1], nearest_velocity[0][2]
+                        x4,y4, q21 = nearest_velocity[1][0], nearest_velocity[1][1], nearest_velocity[1][2]
+                        x3, y3, q12 = nearest_velocity[2][0], nearest_velocity[2][1], nearest_velocity[2][2]
+                        x2, y2, q22 = nearest_velocity[3][0], nearest_velocity[3][1], nearest_velocity[3][2]
+
+                        u = self.calculate_velocity(x,y,x1,x2,y1,y2,q11,q12,q21,q22)
+
+                if type == "y":
+
+                    if nearest_velocity[0][0] == None:
+                        v = 0
+
+                    else:
+                        x1, y1, q11 = nearest_velocity[0][0], nearest_velocity[0][1], nearest_velocity[0][3]
+                        x4,y4, q21 = nearest_velocity[1][0], nearest_velocity[1][1], nearest_velocity[1][3]
+                        x3, y3, q12 = nearest_velocity[2][0], nearest_velocity[2][1], nearest_velocity[2][3]
+                        x2, y2, q22 = nearest_velocity[3][0], nearest_velocity[3][1], nearest_velocity[3][3]
+
+                        v = self.calculate_velocity(x,y,x1,x2,y1,y2,q11,q12,q21,q22)
+
+        except IndexError:
+            print("Index error inside interpolate_velocity")
+            u = 0
+            v = 0
+
+        return float(u), float(v)   
+
+    def main_for_velocity_calculcation(self,x_pos, y_pos):
 
 
+
+        x_points, y_points = self.find_nearest_point(x_pos, y_pos, self.x_interval,self.y_interval)
+        nearest_velocity = self.find_corresponding_velocity(x_points, y_points, x_pos, y_pos)
+
+        try:
+            if nearest_velocity[0][0] == 10:
+            
+                u, v = nearest_velocity[0][2], nearest_velocity[0][3]
+                return u, v
+
+        except IndexError:
+
+            u = 0
+            v = 0
+            return u, v
+
+
+        else:
+            u, v = self.interpolate_velocity(x_pos, y_pos, nearest_velocity)
+
+        return u, v
+
+    def estimate_next_position(self, type=1):
+
+        for subplot in self.subplots:
+
+            row, col = self.subplot_position[subplot][0][0],self.subplot_position[subplot][0][1]
+
+            self.time += 0.1
+
+            for particle_type in self.type:
+                self.calculation(particle_type, self.h)
+                self.plot(particle_type, row, col)
+
+    def calculation(self,particles, time_step):
+
+        i = 0
+
+ 
+        print(particles)
+        for i, particle in enumerate(particles):
+
+            lang = np.random.normal(loc=0, scale=1, size=2)
+            
+            x, y = particle[0], particle[1]
+
+            #if math.isnan(x):
+                #print(("Inside calculation: ",x,y,i))
+
+            u, v = self.main_for_velocity_calculcation(x_pos = x, y_pos = y)
+            #u, v = self.bilinear_interpolation_using_package(x,y)
+            # Euler's equation using lambda function
+            euler = lambda coordinate, random, velocity: coordinate + 2 * np.sqrt(2 * self.D) * np.sqrt(time_step) * random + velocity * time_step
+            next_pos_x = euler(x, lang[0], u)
+            next_pos_y = euler(y, lang[1], v)
+            
+
+            # Creates a "wall" to avoid the particles from moving to places it shouldnt
+            next_pos_x, next_pos_y = self.boundary_conditions(next_pos_x, next_pos_y)
+
+            # Reassign the current particle from substance 1 (in this case), to a new position
+            particles[i] = (next_pos_x, next_pos_y)
+
+    def main(self):
+        sub_1, sub_2 = self.taskB_initial_state()
+        self.estimate_next_position()
+
+        
+
+
+test = Interpolated()
+test.main()
 #concentration_plot = ConcentrationPlot()
-initial_state = InitialState()
-initial_state.call_out_taskA()
-#print(concentration_plot.Np)
+#initial_state = InitialState()
+#initial_state.call_out_taskB()
+
 #concentration_plot.single_plot()
 #concentration_plot.calculate_concentration()
-print(initial_state.sub_1)
-print(initial_state.sub_2)
 
-
-
-#concentration_plot.calculate_concentration()
 plt.show()
+
+
