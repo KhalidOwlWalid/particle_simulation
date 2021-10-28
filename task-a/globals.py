@@ -24,8 +24,8 @@ class Globals:
         self.tEnd = 0.025
         
         # Grids
-        self.Nx = 64
-        self.Ny = 64
+        self.Nx = 20
+        self.Ny = 20
 
         # Create the particles
         self.x = np.random.uniform(low=-1, high=1, size=self.Np)
@@ -33,5 +33,9 @@ class Globals:
 
         # For plots
         self.size = 0.5
+
+        self.velocity_file = 'data_file/velocityCMM3.dat'
+
+        self.include_velocity = True
 
         
