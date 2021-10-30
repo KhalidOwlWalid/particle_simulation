@@ -5,6 +5,9 @@ import numpy as np
 class Globals:
 
     def __init__(self):
+
+        # Substance Attribtue
+        self.radius = 0.3
         
         # Boundaries
         self.xMax = 1
@@ -21,11 +24,11 @@ class Globals:
         # Conditions
         self.h = 0.025
         self.time = 0.0
-        self.tEnd = 0.025
+        self.tEnd = 1
         
         # Grids
-        self.Nx = 20
-        self.Ny = 20
+        self.Nx = 100
+        self.Ny = 100
 
         # Create the particles
         self.x = np.random.uniform(low=-1, high=1, size=self.Np)
@@ -36,6 +39,6 @@ class Globals:
 
         self.velocity_file = 'data_file/velocityCMM3.dat'
 
-        self.include_velocity = True
+        self.include_velocity = False
 
         

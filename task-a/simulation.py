@@ -14,6 +14,7 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
         self.figure, self.axes = plt.subplots()
 
+    # Checks if a particle is going outside the boundary
     def boundary_conditions(self, next_pos_x, next_pos_y):
 
         if next_pos_x > 1:
@@ -34,6 +35,7 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
         return next_pos_x, next_pos_y
 
+    # Runs the simulation 
     def run_simulation(self):
         
         u,v = 0, 0
@@ -73,6 +75,7 @@ class TaskA(InitialState,SimulationMath,Concentration):
             self.time += self.h
             print("[INFO] Time: ", self.time)
 
+    # Sets all the plot condition on the graph
     def plot_condition(self,x,y,color,row = 0, col = 0):
 
         if row == 0 and col == 0:
@@ -82,7 +85,7 @@ class TaskA(InitialState,SimulationMath,Concentration):
             self.axes.set_ylim(ymin=self.yMin, ymax=self.yMax)
             self.axes.scatter(x,y, s=self.size, c=color)
             
-
+    # Obviously
     def plot_solution(self, plot_2D=True):
 
         if plot_2D:
@@ -103,7 +106,8 @@ class TaskA(InitialState,SimulationMath,Concentration):
                     self.plot_condition(x,y, color)
         else:
             pass
-
+    
+    # This produces a pixelated concentration plot
     def concentration_plot(self, grid):
         print("[INFO] Creating concentration plot...")
         sns.heatmap(grid, cmap='RdBu')
@@ -117,17 +121,21 @@ class TaskA(InitialState,SimulationMath,Concentration):
         # plt.savefig('diagram/plot_solution.png')
 
         concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
+
+        if self.Ny == 1:
+            
+            concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0])
         
-        print(concentration_grid)
+        #plt.scatter(*zip(*concentration_list))
+        #print(concentration_grid)
         self.concentration_plot(concentration_grid)
-        plt.savefig('diagram/concentration_plot.png')
+        #plt.savefig('diagram/concentration_plot.png')
         plt.show()
         print("[INFO] Simulation status : Success")
         
 
 test = TaskA()
 
-
-
+test.main()
 
 

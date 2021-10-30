@@ -13,18 +13,29 @@ class SimulationMath(Globals):
 
         n_line = 0
 
-        print("[INFO] Extracting data from {name}".format(name=self.velocity_file))
-
-        for line in open(self.velocity_file , 'r'):
+        if self.velocity_file == "data_file/velocityCMM3.dat":
             
-            if line == "\n":
-                n_line += 1
-            else:
-                lines = [i for i in line.split()]
-                self.data.append((float(lines[0]), float(lines[1]), float(lines[2]), float(lines[3])))
+            for line in open(self.velocity_file , 'r'):
+                
+                if line == "\n":
+                    n_line += 1
+                else:
+                    lines = [i for i in line.split()]
+                    self.data.append((float(lines[0]), float(lines[1]), float(lines[2]), float(lines[3])))
 
+        elif self.velocity_file == "data_file/reference_solution_1D.dat":
+
+            for line in open(self.velocity_file , 'r'):
+                
+                if line == "\n":
+                    n_line += 1
+                else:
+                    lines = [i for i in line.split()]
+                    self.data.append((float(lines[0]), float(lines[1])))
+
+        print("[INFO] Extracting data from {name}".format(name=self.velocity_file))
         print("[INFO] There is {num} empty lines".format(num=n_line))
-        
+
         return self.data
 
     def euler(self, coordinate, vel = 0, vel_type=False):
