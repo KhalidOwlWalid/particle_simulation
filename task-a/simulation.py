@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 
 from simulation_math import SimulationMath
 from initial_state import InitialState
@@ -41,8 +42,8 @@ class TaskA(InitialState,SimulationMath,Concentration):
         u,v = 0, 0
 
         # Run the simulation until time ends
-        while self.time < self.tEnd:
-            
+        #while self.time < self.tEnd:
+        for step in range(self.steps):
             if self.include_velocity:
                 for i, sub_type in enumerate(self.substance_list):
                     for j, coordinate in enumerate(self.substance[sub_type]):
@@ -73,7 +74,7 @@ class TaskA(InitialState,SimulationMath,Concentration):
                         self.substance[sub_type][j] = (next_pos_x, next_pos_y)
 
             self.time += self.h
-            print("[INFO] Time: ", self.time)
+            print("[INFO] Time: ", round(self.time,3))
 
     # Sets all the plot condition on the graph
     def plot_condition(self,x,y,color,row = 0, col = 0):
@@ -97,9 +98,9 @@ class TaskA(InitialState,SimulationMath,Concentration):
                 for j, coordinate in enumerate(self.substance[sub_type]):
 
                     if sub_type == "sub_1":
-                        color = "red"
-                    else:
                         color = "blue"
+                    else:
+                        color = "red"
 
                     x, y = coordinate[0], coordinate[1]
 
@@ -113,27 +114,36 @@ class TaskA(InitialState,SimulationMath,Concentration):
         sns.heatmap(grid, cmap='RdBu')
 
     def main(self):
-        self.substance["sub_1"], self.substance["sub_2"] = self.taskA_initial_state()
+        self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state()
         self.run_simulation()
 
-        # self.plot_solution()
-        # plt.show()
+        self.plot_solution()
+        fig1 = plt.figure()
+        fig3 = plt.figure()
         # plt.savefig('diagram/plot_solution.png')
 
         concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
 
+        # Arrays need to be transposed because it is in vertical form for some reason
+        #transposed_concentration_grid = concentration_grid.T
+
+        #rev_grid = np.flip(transposed_concentration_grid)
+
         if self.Ny == 1:
             
-            concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0])
+            concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], transposed_concentration_grid[0])
+            print(concentration_list)
         
-        #plt.scatter(*zip(*concentration_list))
-        #print(concentration_grid)
+        print(concentration_grid)
         self.concentration_plot(concentration_grid)
         #plt.savefig('diagram/concentration_plot.png')
+
+        #plt.plot(*zip(*concentration_list))
         plt.show()
         print("[INFO] Simulation status : Success")
-        
 
+
+        
 test = TaskA()
 
 test.main()

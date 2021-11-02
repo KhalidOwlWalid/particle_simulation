@@ -24,21 +24,23 @@ class Globals:
         # Conditions
         self.h = 0.025
         self.time = 0.0
-        self.tEnd = 1
+        self.tEnd = 0.2
+
+        self.steps = int(self.tEnd / self.h)
         
         # Grids
-        self.Nx = 100
-        self.Ny = 100
+        self.Nx = 64
+        self.Ny = 64
 
         # Create the particles
         self.x = np.random.uniform(low=-1, high=1, size=self.Np)
         self.y = np.random.uniform(low=-1, high=1, size=self.Np)
 
-        # For plots
-        self.size = 0.5
+        # For size of scatter plots, increase the value to get bigger scatter size
+        self.size = 10
 
         self.velocity_file = 'data_file/velocityCMM3.dat'
 
-        self.include_velocity = False
+        self.include_velocity = True
 
         

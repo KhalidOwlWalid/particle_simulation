@@ -16,7 +16,7 @@ class Concentration(Globals):
         super().__init__()
 
         self.x_grid = np.linspace(-1,1,self.Nx)
-        self.y_grid = np.linspace(-1,1,self.Ny)
+        self.y_grid = np.linspace(1,-1,self.Ny)
 
         self.sub_1 = None
         self.sub_2 = None
@@ -32,7 +32,7 @@ class Concentration(Globals):
 
         zero_div_err = 0
 
-        grid_position = lambda x, y, i, j: x > self.x_grid[i] and x < self.x_grid[i+1] and y > self.y_grid[j] and y < self.y_grid[j+1]
+        grid_position = lambda x, y, i, j: x > self.x_grid[i] and x < self.x_grid[i+1] and y < self.y_grid[j] and y > self.y_grid[j+1]
         
         if self.Ny == 1:
 
@@ -74,7 +74,7 @@ class Concentration(Globals):
                     for particle in sub_1:
                         # Check corner
                         if grid_position(particle[0], particle[1], i, j):
-                            grid_list[i][j] += 1
+                            grid_list[j][i] += 1
                             
                     for particle in sub_2:
                         
@@ -82,7 +82,7 @@ class Concentration(Globals):
                         if grid_position(particle[0], particle[1], i, j):
                             n_sub_2 += 1
                     try:
-                        grid_list[i][j] = grid_list[i][j]/(grid_list[i][j] + n_sub_2)
+                        grid_list[j][i] = grid_list[j][i]/(grid_list[j][i] + n_sub_2)
                     except ZeroDivisionError:
                         zero_div_err += 1
                         print("[WARN] ZeroDivisionError : Not enough particles to calculate")
@@ -112,6 +112,4 @@ class Concentration(Globals):
         except IndexError:
             print("[DEBUG] Index Error write something here")
 
-        print(concentration_plot)
-        
         return concentration_plot

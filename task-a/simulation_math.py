@@ -1,5 +1,6 @@
 import numpy as np
 import math
+from scipy import interpolate
 
 from globals import Globals
 
@@ -8,6 +9,12 @@ class SimulationMath(Globals):
     def __init__(self):
         super().__init__()
         self.data = []
+        self.x_data = []
+        self.y_data = []
+        self.u_data = []
+        self.v_data = []
+        self.extract_data()
+        
     
     def extract_data(self):
 
@@ -22,7 +29,12 @@ class SimulationMath(Globals):
                 else:
                     lines = [i for i in line.split()]
                     self.data.append((float(lines[0]), float(lines[1]), float(lines[2]), float(lines[3])))
+                    self.x_data.append(float(lines[0]))
+                    self.y_data.append(float(lines[1]))
+                    self.u_data.append(float(lines[2]))
+                    self.v_data.append(float(lines[3]))
 
+            
         elif self.velocity_file == "data_file/reference_solution_1D.dat":
 
             for line in open(self.velocity_file , 'r'):
@@ -42,7 +54,7 @@ class SimulationMath(Globals):
 
         random = np.random.normal(0,1,1)
 
-        euler_func = lambda coordinate : coordinate + vel * self.h + np.sqrt(2 * self.D) * np.sqrt(self.h) * float(random)
+        euler_func = lambda coordinate, vel: coordinate + vel * self.h + np.sqrt(2 * self.D) * np.sqrt(self.h) * float(random)
 
         if vel_type:
             next_pos = euler_func(coordinate,vel)
@@ -73,9 +85,21 @@ class SimulationMath(Globals):
 
 
         else:
-            u, v = self.interpolate_velocity(x_pos, y_pos, nearest_velocity)
+            u, v = self.interpolate_velocity(x, y, nearest_velocity)
 
         return u,v
+
+    def bilinear_interpolation_using_package(self, x_coordinate, y_coordinate):
+
+        xx = x_coordinate
+        yy = y_coordinate
+        xx, yy = np.meshgrid(xx, yy)
+
+        points = np.transpose(np.vstack((self.x_data, self.y_data)))
+        u_interp = interpolate.griddata(points, self.u_data, (xx, yy), method='linear')
+        v_interp = interpolate.griddata(points, self.v_data, (xx, yy), method='linear')
+
+        return u_interp, v_interp
 
     def find_nearest_point(self, x, y, x_list, y_list):
 
@@ -107,30 +131,29 @@ class SimulationMath(Globals):
             for j in y_points:
                 pairs.append((i,j))
 
-        condition = lambda x_pos, y_pos : x_pos < 0.96875 or x_pos > 0.96875 or y_pos < 0.96875 or y_pos > 0.96875
+        condition = lambda x_pos, y_pos : x_pos < -0.96875 or x_pos > 0.96875 or y_pos < -0.96875 or y_pos > 0.96875
 
         if condition(x_pos, y_pos):
             u, v = self.bilinear_interpolation_using_package(x_pos, y_pos)
             x, y = 10, 10
             velocity.append((x,y,float(u),float(v)))
 
-            return velocity
+        else:
+            for i, coordinate in enumerate(pairs):
+                
+                #if condition(coordinate[0], coordinate[1]) or condition(x_pos, y_pos):
+                if coordinate[0] > 0.96875 or coordinate[0] < -0.96875 or coordinate[1] < -0.96875 or coordinate[1] > 0.96875:
+                        u, v = self.bilinear_interpolation_using_package(x_pos, y_pos)
+                        x, y = None, None
+                        velocity.append((x,y,u,v))
+                        break
 
-        for i, coordinate in enumerate(pairs):
-            
-            #if condition(coordinate[0], coordinate[1]) or condition(x_pos, y_pos):
-            if coordinate[0] > 0.96875 or coordinate[0] < -0.96875 or coordinate[1] < -0.96875 or coordinate[1] > 0.96875:
-                    u, v = self.bilinear_interpolation_using_package(x_pos, y_pos)
-                    x, y = None, None
-                    velocity.append((x,y,u,v))
-                    break
+                else:
+                    for j, points in enumerate(self.data):
 
-            else:
-                for j, points in enumerate(self.extracted_data):
-
-                    if len(pairs) == 4:
-                        if coordinate[0] == points[0] and coordinate[1] == points[1]:
-                            velocity.append(points)
+                        if len(pairs) == 4:
+                            if coordinate[0] == points[0] and coordinate[1] == points[1]:
+                                velocity.append(points)
 
         return velocity
 
@@ -173,4 +196,17 @@ class SimulationMath(Globals):
             v = 0
 
         return float(u), float(v)   
+
+    def calculate_velocity(self,x,y,x1,x2,y1,y2,q11,q12,q21,q22):
+
+        a = np.array([[x2-x ,x-x1]])
+        b = np.array([[q11,q12], [q21, q22]])
+        c = np.array([[y2-y], [y-y1]])
+        denominator = 1/((x2-x1) * (y2-y1))
+
+        A = np.dot(a,b)
+        B = np.dot(A, c)
+        C = denominator * B
+
+        return C
         
