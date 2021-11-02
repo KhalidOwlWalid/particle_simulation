@@ -42,7 +42,6 @@ class TaskA(InitialState,SimulationMath,Concentration):
         u,v = 0, 0
 
         # Run the simulation until time ends
-        #while self.time < self.tEnd:
         for step in range(self.steps):
             if self.include_velocity:
                 for i, sub_type in enumerate(self.substance_list):
@@ -91,12 +90,13 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
         if plot_2D:
             for i, sub_type in enumerate(self.substance_list):
-
+                
                 color = None 
                 print("Plotting for ", sub_type)
 
                 for j, coordinate in enumerate(self.substance[sub_type]):
-
+                    
+                    # Set the color of substance 1 as blue, and red otherwise
                     if sub_type == "sub_1":
                         color = "blue"
                     else:
@@ -114,32 +114,31 @@ class TaskA(InitialState,SimulationMath,Concentration):
         sns.heatmap(grid, cmap='RdBu')
 
     def main(self):
-        self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state()
-        self.run_simulation()
-
-        self.plot_solution()
         fig1 = plt.figure()
         fig3 = plt.figure()
-        # plt.savefig('diagram/plot_solution.png')
+
+        # Here you can choose to switch between task A and task B initial state
+        self.substance["sub_1"], self.substance["sub_2"] = self.taskA_initial_state()
+        self.run_simulation()
+
+
+        self.plot_solution()
+        plt.savefig('diagram/plot_solution.png')
 
         concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
 
-        # Arrays need to be transposed because it is in vertical form for some reason
-        #transposed_concentration_grid = concentration_grid.T
-
-        #rev_grid = np.flip(transposed_concentration_grid)
-
+        # 
         if self.Ny == 1:
-            
-            concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], transposed_concentration_grid[0])
-            print(concentration_list)
+            pass
+            # Needs to recheck the calculation
+            # concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], transposed_concentration_grid[0])
+            # print(concentration_list)
         
         print(concentration_grid)
         self.concentration_plot(concentration_grid)
-        #plt.savefig('diagram/concentration_plot.png')
-
-        #plt.plot(*zip(*concentration_list))
+        plt.savefig('diagram/concentration_plot.png')
         plt.show()
+
         print("[INFO] Simulation status : Success")
 
 
