@@ -16,7 +16,7 @@ class InitialState(Globals):
         
     def taskA_initial_state(self):
 
-        isInside = lambda x_coordinate, y_coordinate, radius : x_coordinate ** 2 + y_coordinate ** 2 <= self.radius ** 2
+        isInside = lambda x_coordinate, y_coordinate, radius : (x_coordinate - self.offset_x) ** 2 + (y_coordinate - self.offset_y) ** 2 <= self.radius ** 2
 
         # Divide the particles into their substance type
         for i in range(self.Np):

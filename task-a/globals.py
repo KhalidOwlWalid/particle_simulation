@@ -7,7 +7,9 @@ class Globals:
     def __init__(self):
 
         # Substance Attribtue
-        self.radius = 0.3
+        self.radius = 0.4
+        self.offset_x = 0.4
+        self.offset_y = 0.4
         
         # Boundaries
         self.xMax = 1
@@ -16,21 +18,21 @@ class Globals:
         self.yMin = -1
         
         # Number of particles
-        self.Np = 50000
+        self.Np = 150000
 
         # Diffusivity
-        self.D = 0.01
+        self.D = 0.1
 
         # Conditions
         self.h = 0.025
         self.time = 0.0
-        self.tEnd = 0.2
+        self.tEnd = 0.025
 
         self.steps = int(self.tEnd / self.h)
         
         # Grids
-        self.Nx = 64
-        self.Ny = 64
+        self.Nx = 70
+        self.Ny = 70
 
         # Create the particles
         self.x = np.random.uniform(low=-1, high=1, size=self.Np)

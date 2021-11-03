@@ -59,7 +59,7 @@ class SimulationMath(Globals):
         if vel_type:
             next_pos = euler_func(coordinate,vel)
         else:
-            next_pos = euler_func(coordinate)
+            next_pos = euler_func(coordinate, vel=0)
 
         return next_pos
     

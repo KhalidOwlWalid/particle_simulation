@@ -95,51 +95,57 @@ class TaskA(InitialState,SimulationMath,Concentration):
                 color = None 
                 print("Plotting for ", sub_type)
 
-                for j, coordinate in enumerate(self.substance[sub_type]):
+                # for j, coordinate in enumerate(self.substance[sub_type]):
 
-                    if sub_type == "sub_1":
-                        color = "blue"
-                    else:
-                        color = "red"
+                if sub_type == "sub_1":
+                    color = "blue"
+                else:
+                    color = "red"
 
-                    x, y = coordinate[0], coordinate[1]
+                #     print(j)
+                #     x, y = coordinate[0], coordinate[1]
 
-                    self.plot_condition(x,y, color)
+                #     self.plot_condition(x,y, color)
+                #     plt.savefig('diagram/plot_solution.png')
+                self.axes.set_xbound(lower=self.xMin, upper=self.xMax)
+                self.axes.set_xlim(xmin=self.xMin, xmax=self.xMax)
+                self.axes.set_ybound(lower=self.yMin, upper=self.yMax)
+                self.axes.set_ylim(ymin=self.yMin, ymax=self.yMax)
+                self.axes.scatter(*zip(*self.substance[sub_type]), s=self.size, c=color)
+            
+
         else:
             pass
     
     # This produces a pixelated concentration plot
     def concentration_plot(self, grid):
         print("[INFO] Creating concentration plot...")
-        sns.heatmap(grid, cmap='RdBu')
+
+        # gist_ncar, seismic
+        sns.heatmap(grid, cmap='seismic')
 
     def main(self):
-        self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state()
+        self.substance["sub_1"], self.substance["sub_2"] = self.taskA_initial_state()
+
+        print("[INFO] Running the simulation...")
         self.run_simulation()
 
+        print("[INFO] Plotting the solution for time : {solution}".format(solution=self.tEnd))
         self.plot_solution()
         fig1 = plt.figure()
-        fig3 = plt.figure()
-        # plt.savefig('diagram/plot_solution.png')
+
+        
 
         concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
-
-        # Arrays need to be transposed because it is in vertical form for some reason
-        #transposed_concentration_grid = concentration_grid.T
-
-        #rev_grid = np.flip(transposed_concentration_grid)
-
-        if self.Ny == 1:
-            
-            concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], transposed_concentration_grid[0])
-            print(concentration_list)
         
         print(concentration_grid)
         self.concentration_plot(concentration_grid)
-        #plt.savefig('diagram/concentration_plot.png')
+        plt.savefig('diagram/concentration_plot.png')
 
-        #plt.plot(*zip(*concentration_list))
         plt.show()
+
+
+        print("The number of particles involved: ", (len(self.substance["sub_1"]) + len(self.substance["sub_2"])))
         print("[INFO] Simulation status : Success")
 
 
