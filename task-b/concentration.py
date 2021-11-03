@@ -96,20 +96,22 @@ class Concentration(Globals):
         return np.array(grid_list)
 
     # This one is actually meant for the use of task B, but I have created it and tested it on task A
-    def assign_concentration(self, sub_1, sub_2, concentration_grid):
+    def assign_concentration(self, sub_1, sub_2, concentration_grid, x_grid):
         
         concentration_plot = []
+        
+        print(concentration_grid)
+        # try:
+        for i, concentration in enumerate(concentration_grid) :
+            print(concentration)
+            for particle in sub_1:
+                if particle[0] > x_grid[i] and particle[0] < x_grid[i+1]:
+                    concentration_plot.append((particle[0], concentration))
 
-        try:
-            for i, concentration in enumerate(concentration_grid) :
-                for particle in sub_1:
-                    if particle[0] > concentration_grid[i] and particle[0] < concentration_grid[i+1]:
-                        concentration_plot.append((particle[0], concentration))
-
-                for particle in sub_2:
-                    if particle[0] > concentration_grid[i] and particle[0] < concentration_grid[i+1]:
-                        concentration_plot.append((particle[0], concentration))
-        except IndexError:
-            print("[DEBUG] Index Error write something here")
+            for particle in sub_2:
+                if particle[0] > x_grid[i] and particle[0] < x_grid[i+1]:
+                    concentration_plot.append((particle[0], concentration))
+        # except IndexError:
+        #     print("[DEBUG] Index Error write something here")
 
         return concentration_plot

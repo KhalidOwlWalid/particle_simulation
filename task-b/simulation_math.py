@@ -54,7 +54,7 @@ class SimulationMath(Globals):
 
         random = np.random.normal(0,1,1)
 
-        euler_func = lambda coordinate, vel: coordinate + vel * self.h + np.sqrt(2 * self.D) * np.sqrt(self.h) * float(random)
+        euler_func = lambda coordinate, vel = 0: coordinate + vel * self.h + np.sqrt(2 * self.D) * np.sqrt(self.h) * float(random)
 
         if vel_type:
             next_pos = euler_func(coordinate,vel)

@@ -16,10 +16,10 @@ class Globals:
         self.yMin = -1
         
         # Number of particles
-        self.Np = 50000
+        self.Np = 64000
 
         # Diffusivity
-        self.D = 0.01
+        self.D = 0.1
 
         # Conditions
         self.h = 0.025
@@ -29,8 +29,8 @@ class Globals:
         self.steps = int(self.tEnd / self.h)
         
         # Grids
-        self.Nx = 64
-        self.Ny = 64
+        self.Nx = 100
+        self.Ny = 1
 
         # Create the particles
         self.x = np.random.uniform(low=-1, high=1, size=self.Np)
@@ -39,8 +39,8 @@ class Globals:
         # For size of scatter plots, increase the value to get bigger scatter size
         self.size = 10
 
-        self.velocity_file = 'data_file/velocityCMM3.dat'
+        self.velocity_file = 'data_file/reference_solution_1D.dat'
 
-        self.include_velocity = True
+        self.include_velocity = False
 
         

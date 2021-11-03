@@ -115,10 +115,9 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
     def main(self):
         fig1 = plt.figure()
-        fig3 = plt.figure()
 
         # Here you can choose to switch between task A and task B initial state
-        self.substance["sub_1"], self.substance["sub_2"] = self.taskA_initial_state()
+        self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state()
         self.run_simulation()
 
 
@@ -127,15 +126,19 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
         concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
 
-        # 
         if self.Ny == 1:
-            pass
-            # Needs to recheck the calculation
-            # concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], transposed_concentration_grid[0])
-            # print(concentration_list)
+            
+            x_grid = np.linspace(-1,1,self.Nx)
+            concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
+
         
-        print(concentration_grid)
+        print(len(concentration_list))
+        
         self.concentration_plot(concentration_grid)
+
+        fig_conc, axes_conc = plt.subplots()
+        axes_conc.scatter(*zip(*concentration_list), s = 1.5, color="blue")
+        axes_conc.scatter(*zip(*self.data), s=1, color="red")
         plt.savefig('diagram/concentration_plot.png')
         plt.show()
 
