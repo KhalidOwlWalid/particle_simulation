@@ -16,7 +16,7 @@ class TaskA(InitialState,SimulationMath,Concentration):
         self.figure, self.axes = plt.subplots()
 
     # Checks if a particle is going outside the boundary
-    def boundary_conditions(self, next_pos_x, next_pos_y):
+    def boundary_conditions(self, next_pos_x):
 
         if next_pos_x > 1:
             distanceFromMax = next_pos_x - self.xMax
@@ -26,15 +26,7 @@ class TaskA(InitialState,SimulationMath,Concentration):
             distanceFromMax = next_pos_x - self.xMin
             next_pos_x = next_pos_x - 2 * distanceFromMax
 
-        if next_pos_y > 1:
-            distanceFromMax = next_pos_y - self.yMax
-            next_pos_y = next_pos_y - 2 * distanceFromMax
-
-        elif next_pos_y < -1:
-            distanceFromMax = next_pos_y - self.yMin
-            next_pos_y = next_pos_y - 2 * distanceFromMax
-
-        return next_pos_x, next_pos_y
+        return next_pos_x
 
     # Runs the simulation 
     def run_simulation(self):
@@ -43,34 +35,19 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
         # Run the simulation until time ends
         for step in range(self.steps):
-            if self.include_velocity:
-                for i, sub_type in enumerate(self.substance_list):
-                    for j, coordinate in enumerate(self.substance[sub_type]):
-                        x, y = coordinate[0], coordinate[1]
-                        
-                        u,v = self.bilinear_interpolation(x,y)
-                        # Calculate using euler's equation
-                        next_pos_x = self.euler(x,vel = u ,vel_type=True)
-                        next_pos_y = self.euler(y, vel = v, vel_type=True)
+            
 
-                        x, y = self.boundary_conditions(next_pos_x, next_pos_y)
+            for i, sub_type in enumerate(self.substance_list):
+                for j, coordinate in enumerate(self.substance[sub_type]):
+                    x = coordinate
+                    
+                    # Calculate using euler's equation
+                    next_pos_x = self.euler(x)
 
-                        # Update our particle's coordinate 
-                        self.substance[sub_type][j] = (next_pos_x, next_pos_y)
+                    x = self.boundary_conditions(next_pos_x)
 
-            else:
-                for i, sub_type in enumerate(self.substance_list):
-                    for j, coordinate in enumerate(self.substance[sub_type]):
-                        x, y = coordinate[0], coordinate[1]
-                        
-                        # Calculate using euler's equation
-                        next_pos_x = self.euler(x)
-                        next_pos_y = self.euler(y)
-
-                        x, y = self.boundary_conditions(next_pos_x, next_pos_y)
-
-                        # Update our particle's coordinate 
-                        self.substance[sub_type][j] = (next_pos_x, next_pos_y)
+                    # Update our particle's coordinate 
+                    self.substance[sub_type][j] = next_pos_x
 
             self.time += self.h
             print("[INFO] Time: ", round(self.time,3))
@@ -114,36 +91,28 @@ class TaskA(InitialState,SimulationMath,Concentration):
         sns.heatmap(grid, cmap='RdBu')
 
     def main(self):
-        fig1 = plt.figure()
 
         # Here you can choose to switch between task A and task B initial state
         self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state()
         self.run_simulation()
 
-
-        self.plot_solution()
-        plt.savefig('diagram/plot_solution.png')
+        # self.plot_solution(plot_2D=False)
+        # plt.savefig('diagram/plot_solution.png')
 
         concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
 
-        if self.Ny == 1:
-            
-            x_grid = np.linspace(-1,1,self.Nx)
-            concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
+        x_grid = np.linspace(-1,1,self.Nx)
+        concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
 
-        
-        print(len(concentration_list))
-        
-        self.concentration_plot(concentration_grid)
+        # self.concentration_plot(concentration_grid)
 
-        fig_conc, axes_conc = plt.subplots()
-        axes_conc.scatter(*zip(*concentration_list), s = 1.5, color="blue")
-        axes_conc.scatter(*zip(*self.data), s=1, color="red")
+        self.axes.scatter(*zip(*concentration_list), s=5, color="blue")
+        #self.axes.plot(*zip(*concentration_list),color="blue")
+        self.axes.plot(*zip(*self.data), color="red")
         plt.savefig('diagram/concentration_plot.png')
         plt.show()
 
         print("[INFO] Simulation status : Success")
-
 
         
 test = TaskA()

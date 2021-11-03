@@ -32,67 +32,36 @@ class Concentration(Globals):
 
         zero_div_err = 0
 
-        grid_position = lambda x, y, i, j: x > self.x_grid[i] and x < self.x_grid[i+1] and y < self.y_grid[j] and y > self.y_grid[j+1]
-        
-        if self.Ny == 1:
+        grid_position = lambda x, i : x > self.x_grid[i] and x < self.x_grid[i+1] 
 
-            grid_list.append([0 for j in range(self.Nx - 1)])
 
-            for n in range(len(self.x_grid) - 1):
+        grid_list.append([0 for j in range(self.Nx - 1)])
+
+        for n in range(len(self.x_grid) - 1):
+            
+            try:
+                n_sub_2 = 0 
+
+                for particle in sub_1:
+                    if particle > self.x_grid[n] and particle < self.x_grid[n+1]:
+                        grid_list[0][n] += 1
+
+                for particle in sub_2:
+                    if particle > self.x_grid[n] and particle < self.x_grid[n+1]:
+                        n_sub_2 += 1
+
+            except IndexError:
+                print("[DEBUG] Index out of range which is the {n}th column".format(n=n))
+
+            try:
+                grid_list[0][n] = grid_list[0][n]/(grid_list[0][n] + n_sub_2)
+
+            except ZeroDivisionError:
+                print("[WARN] ZeroDivisionError : Not enough particles to calculate")
+
+            except IndexError:
+                print("[WARN] IndexError")
                 
-                try:
-                    n_sub_2 = 0 
-                    for particle in sub_1:
-                        if particle[0] > self.x_grid[n] and particle[0] < self.x_grid[n+1]:
-                            grid_list[0][n] += 1
-
-                    for particle in sub_2:
-                        if particle[0] > self.x_grid[n] and particle[0] < self.x_grid[n+1]:
-                            n_sub_2 += 1
-                except IndexError:
-                    print("[DEBUG] Index out of range which is the {n}th column".format(n=n))
-
-                try:
-                    grid_list[0][n] = grid_list[0][n]/(grid_list[0][n] + n_sub_2)
-
-                except ZeroDivisionError:
-                    print("[WARN] ZeroDivisionError : Not enough particles to calculate")
-
-                except IndexError:
-                    print("[WARN] IndexError")
-                
-
-        else:
-            for i in range(self.Nx - 1):
-                grid_list.append([0 for j in range(self.Ny - 1)])
-
-            for i in range(len(self.x_grid)- 1):
-                for j in range(len(self.y_grid) - 1):
-
-                    n_sub_2 = 0
-
-                    for particle in sub_1:
-                        # Check corner
-                        if grid_position(particle[0], particle[1], i, j):
-                            grid_list[j][i] += 1
-                            
-                    for particle in sub_2:
-                        
-                        # Check corner
-                        if grid_position(particle[0], particle[1], i, j):
-                            n_sub_2 += 1
-                    try:
-                        grid_list[j][i] = grid_list[j][i]/(grid_list[j][i] + n_sub_2)
-                    except ZeroDivisionError:
-                        zero_div_err += 1
-                        print("[WARN] ZeroDivisionError : Not enough particles to calculate")
-
-                    except IndexError:
-                        print("[WARN] IndexError: Out of boundaries at column {col}, row {row}".format(col=i, row=j))
-
-                    finally:
-                        print("[INFO] Number of empty pixels : {num}".format(num=zero_div_err))
-                        
         return np.array(grid_list)
 
     # This one is actually meant for the use of task B, but I have created it and tested it on task A
@@ -105,12 +74,12 @@ class Concentration(Globals):
         for i, concentration in enumerate(concentration_grid) :
             print(concentration)
             for particle in sub_1:
-                if particle[0] > x_grid[i] and particle[0] < x_grid[i+1]:
-                    concentration_plot.append((particle[0], concentration))
+                if particle > x_grid[i] and particle < x_grid[i+1]:
+                    concentration_plot.append((particle, concentration))
 
             for particle in sub_2:
-                if particle[0] > x_grid[i] and particle[0] < x_grid[i+1]:
-                    concentration_plot.append((particle[0], concentration))
+                if particle > x_grid[i] and particle < x_grid[i+1]:
+                    concentration_plot.append((particle, concentration))
         # except IndexError:
         #     print("[DEBUG] Index Error write something here")
 
