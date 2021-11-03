@@ -89,7 +89,6 @@ class SimulationMath(Globals):
 
         return u,v
 
-    # This is only used in the case of 'emergency'
     def bilinear_interpolation_using_package(self, x_coordinate, y_coordinate):
 
         xx = x_coordinate
@@ -102,7 +101,6 @@ class SimulationMath(Globals):
 
         return u_interp, v_interp
 
-    # Find the nearest point to our x and y coordinate
     def find_nearest_point(self, x, y, x_list, y_list):
 
         nearest_x_points = []
@@ -124,7 +122,6 @@ class SimulationMath(Globals):
 
         return nearest_x_points, nearest_y_points
 
-    # Find the velocity for the given x and y coordinate
     def find_corresponding_velocity(self, x_points, y_points, x_pos, y_pos):
 
         pairs = []
@@ -160,8 +157,6 @@ class SimulationMath(Globals):
 
         return velocity
 
-    
-    # Perform the calculation for our velocity interpolation
     def interpolate_velocity(self,x,y,nearest_velocity):
 
         velocity_type = ["x", "y"]
@@ -170,8 +165,7 @@ class SimulationMath(Globals):
             for type in velocity_type:
                 
                 if type == "x":
-                    
-                    # Sets the velocity as None to any particles that have no nearest velocity
+
                     if nearest_velocity[0][1] == None:
                         u = 0
 
@@ -203,7 +197,6 @@ class SimulationMath(Globals):
 
         return float(u), float(v)   
 
-    # The interpolation's math
     def calculate_velocity(self,x,y,x1,x2,y1,y2,q11,q12,q21,q22):
 
         a = np.array([[x2-x ,x-x1]])
