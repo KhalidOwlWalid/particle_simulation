@@ -90,6 +90,13 @@ class TaskA(InitialState,SimulationMath,Concentration):
         print("[INFO] Creating concentration plot...")
         sns.heatmap(grid, cmap='RdBu')
 
+    def save_to_txt(self,array):
+
+        for element in array: #you wouldn't need to write this since you are already in a loop
+            file1 = open("observed_data/observed_concentration_v3.txt","a") 
+            file1.write("{x_avg} {concentration}\n".format(x_avg=round(element[0], 7), concentration=element[1])) 
+            file1.close()
+
     def main(self):
 
         # Here you can choose to switch between task A and task B initial state
@@ -102,15 +109,18 @@ class TaskA(InitialState,SimulationMath,Concentration):
         concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
 
         x_grid = np.linspace(-1,1,self.Nx)
+        
         concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
 
         # self.concentration_plot(concentration_grid)
 
-        self.axes.scatter(*zip(*concentration_list), s=5, color="blue")
-        #self.axes.plot(*zip(*concentration_list),color="blue")
+        #self.axes.scatter(*zip(*concentration_list), s=5, color="blue")
+        self.axes.plot(*zip(*concentration_list),'-bo', color="blue", markersize=3)
         self.axes.plot(*zip(*self.data), color="red")
         plt.savefig('diagram/concentration_plot.png')
         plt.show()
+
+        self.save_to_txt(concentration_list)
 
         print("[INFO] Simulation status : Success")
 
