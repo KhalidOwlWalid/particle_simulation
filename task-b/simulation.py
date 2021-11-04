@@ -120,8 +120,6 @@ class TaskA(InitialState,SimulationMath,Concentration):
         plt.savefig('diagram/concentration_plot.png')
         plt.show()
 
-        self.save_to_txt(concentration_list)
-
         print("[INFO] Simulation status : Success")
 
         
