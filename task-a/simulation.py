@@ -98,9 +98,9 @@ class TaskA(InitialState,SimulationMath,Concentration):
                 # for j, coordinate in enumerate(self.substance[sub_type]):
 
                 if sub_type == "sub_1":
-                    color = "blue"
-                else:
                     color = "red"
+                else:
+                    color = "blue"
 
                 #     print(j)
                 #     x, y = coordinate[0], coordinate[1]
@@ -123,6 +123,7 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
         # gist_ncar, seismic
         sns.heatmap(grid, cmap='seismic')
+
 
     def main(self):
         self.substance["sub_1"], self.substance["sub_2"] = self.taskA_initial_state()
