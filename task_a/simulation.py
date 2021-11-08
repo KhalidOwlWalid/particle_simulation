@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+import time
 
 from simulation_math import SimulationMath
 from initial_state import InitialState
@@ -116,6 +117,9 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
 
     def main(self):
+
+        start = time.process_time()
+
         self.substance["sub_1"], self.substance["sub_2"] = self.taskA_initial_state()
 
         print("[INFO] Running the simulation...")
@@ -133,6 +137,7 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
         print("The number of particles involved: ", (len(self.substance["sub_1"]) + len(self.substance["sub_2"])))
         print("[INFO] Simulation status : Success")
+        print("[INFO] The time taken to complete the simulation is {time}".format(time=(time.process_time() - start)))
 
         plt.show()
 

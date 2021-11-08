@@ -147,19 +147,11 @@ class SimulationMath(Globals):
         else:
             for i, coordinate in enumerate(pairs):
                 
-                #if condition(coordinate[0], coordinate[1]) or condition(x_pos, y_pos):
-                if coordinate[0] > 0.96875 or coordinate[0] < -0.96875 or coordinate[1] < -0.96875 or coordinate[1] > 0.96875:
-                        u, v = self.bilinear_interpolation_using_package(x_pos, y_pos)
-                        x, y = None, None
-                        velocity.append((x,y,u,v))
-                        break
+                for j, points in enumerate(self.data):
 
-                else:
-                    for j, points in enumerate(self.data):
-
-                        if len(pairs) == 4:
-                            if coordinate[0] == points[0] and coordinate[1] == points[1]:
-                                velocity.append(points)
+                    if len(pairs) == 4:
+                        if coordinate[0] == points[0] and coordinate[1] == points[1]:
+                            velocity.append(points)
 
         return velocity
 

@@ -18,7 +18,7 @@ class Globals:
         self.yMin = -1
         
         # Number of particles
-        self.Np = 15000
+        self.Np = 150
 
         # Diffusivity
         self.D = 0.01
@@ -39,7 +39,7 @@ class Globals:
         self.y = np.random.uniform(low=-1, high=1, size=self.Np)
 
         # For size of scatter plots, increase the value to get bigger scatter size
-        self.size = 1
+        self.size = 20
 
         self.velocity_file = 'data_file/velocityCMM3.dat'
 
