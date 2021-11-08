@@ -42,7 +42,6 @@ class TaskA(InitialState,SimulationMath,Concentration):
         u,v = 0, 0
 
         # Run the simulation until time ends
-        #while self.time < self.tEnd:
         for step in range(self.steps):
             if self.include_velocity:
                 for i, sub_type in enumerate(self.substance_list):
@@ -95,34 +94,25 @@ class TaskA(InitialState,SimulationMath,Concentration):
                 color = None 
                 print("Plotting for ", sub_type)
 
-                # for j, coordinate in enumerate(self.substance[sub_type]):
-
                 if sub_type == "sub_1":
                     color = "red"
                 else:
                     color = "blue"
 
-                #     print(j)
-                #     x, y = coordinate[0], coordinate[1]
-
-                #     self.plot_condition(x,y, color)
-                #     plt.savefig('diagram/plot_solution.png')
                 self.axes.set_xbound(lower=self.xMin, upper=self.xMax)
                 self.axes.set_xlim(xmin=self.xMin, xmax=self.xMax)
                 self.axes.set_ybound(lower=self.yMin, upper=self.yMax)
                 self.axes.set_ylim(ymin=self.yMin, ymax=self.yMax)
                 self.axes.scatter(*zip(*self.substance[sub_type]), s=self.size, c=color)
-            
 
-        else:
-            pass
     
     # This produces a pixelated concentration plot
     def concentration_plot(self, grid):
         print("[INFO] Creating concentration plot...")
 
-        # gist_ncar, seismic
-        sns.heatmap(grid, cmap='seismic')
+        # gist_ncar, seismic, coolwarm, brg
+        # https://matplotlib.org/stable/gallery/color/colormap_reference.html
+        sns.heatmap(grid, cmap='brg')
 
 
     def main(self):
@@ -135,24 +125,16 @@ class TaskA(InitialState,SimulationMath,Concentration):
         self.plot_solution()
         fig1 = plt.figure()
 
-        
-
         concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
         
         print(concentration_grid)
         self.concentration_plot(concentration_grid)
         plt.savefig('diagram/concentration_plot.png')
 
-        plt.show()
-
-
         print("The number of particles involved: ", (len(self.substance["sub_1"]) + len(self.substance["sub_2"])))
         print("[INFO] Simulation status : Success")
 
+        plt.show()
 
-        
-test = TaskA()
-
-test.main()
 
 

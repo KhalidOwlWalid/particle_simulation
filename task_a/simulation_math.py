@@ -73,7 +73,7 @@ class SimulationMath(Globals):
         nearest_velocity = self.find_corresponding_velocity(nearest_x, nearest_y, x, y)
 
         try:
-            if nearest_velocity[0][0] == 10:
+            if nearest_velocity[0][0] == None:
             
                 u, v = nearest_velocity[0][2], nearest_velocity[0][3]
                 return u, v
@@ -99,6 +99,12 @@ class SimulationMath(Globals):
         u_interp = interpolate.griddata(points, self.u_data, (xx, yy), method='linear')
         v_interp = interpolate.griddata(points, self.v_data, (xx, yy), method='linear')
 
+        if math.isnan(u_interp):
+            u_interp = 0
+
+        if math.isnan(v_interp):
+            v_interp = 0
+
         return u_interp, v_interp
 
     def find_nearest_point(self, x, y, x_list, y_list):
@@ -122,20 +128,20 @@ class SimulationMath(Globals):
 
         return nearest_x_points, nearest_y_points
 
-    def find_corresponding_velocity(self, x_points, y_points, x_pos, y_pos):
+    def find_corresponding_velocity(self, nearest_x, nearest_y, x_pos, y_pos):
 
         pairs = []
         velocity = []
 
-        for i in x_points:
-            for j in y_points:
+        for i in nearest_x:
+            for j in nearest_y:
                 pairs.append((i,j))
 
         condition = lambda x_pos, y_pos : x_pos < -0.96875 or x_pos > 0.96875 or y_pos < -0.96875 or y_pos > 0.96875
 
         if condition(x_pos, y_pos):
             u, v = self.bilinear_interpolation_using_package(x_pos, y_pos)
-            x, y = 10, 10
+            x, y = None, None
             velocity.append((x,y,float(u),float(v)))
 
         else:
