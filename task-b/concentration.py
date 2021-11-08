@@ -68,13 +68,9 @@ class Concentration(Globals):
     def assign_concentration(self, sub_1, sub_2, concentration_grid, x_grid):
         
         concentration_plot = []
-        
-        
-        print(concentration_grid)
-        # try:
+
         for i, concentration in enumerate(concentration_grid) :
             avg_x_coordinates = []
-            print(concentration)
             for particle in sub_1:
                 if particle > x_grid[i] and particle < x_grid[i+1]:
                     avg_x_coordinates.append(particle)
@@ -87,7 +83,5 @@ class Concentration(Globals):
 
             concentration_plot.append((avg_x, concentration))
                 
-        # except IndexError:
-        #     print("[DEBUG] Index Error write something here")
 
         return concentration_plot

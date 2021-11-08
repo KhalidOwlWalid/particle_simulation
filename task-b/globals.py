@@ -16,13 +16,13 @@ class Globals:
         self.yMin = -1
         
         # Number of particles
-        self.Np = 16000
+        self.Np = 10000
 
         # Diffusivity
         self.D = 0.1
 
         # Conditions
-        self.h = 0.025
+        self.h = 0.01
         self.time = 0.0
         self.tEnd = 0.2
 

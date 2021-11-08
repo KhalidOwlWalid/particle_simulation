@@ -10,13 +10,13 @@ class InitialState(Globals):
     def __init__(self):
         
         super().__init__()
-    
-        self.sub_1 = []
-        self.sub_2 = []
    
     def taskB_initial_state(self):
 
         toTheLeft = lambda coordinate : coordinate <= 0
+
+        self.sub_1 = []
+        self.sub_2 = []
 
         # Divide the particles into their substance type
         for i in range(self.Np):
@@ -29,5 +29,6 @@ class InitialState(Globals):
             else:
                 self.sub_2.append(self.x[i])
 
+        print((len(self.sub_1) + len(self.sub_2)))
         return self.sub_1, self.sub_2
 

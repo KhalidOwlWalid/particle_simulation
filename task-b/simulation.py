@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+import time
 
 from simulation_math import SimulationMath
 from initial_state import InitialState
@@ -10,9 +11,11 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
     def __init__(self):
         super().__init__()
+
         self.substance = {"sub_1": [], "sub_2": []}
         self.substance_list = ["sub_1", "sub_2"]
 
+        
         self.figure, self.axes = plt.subplots()
 
     # Checks if a particle is going outside the boundary
@@ -49,8 +52,8 @@ class TaskA(InitialState,SimulationMath,Concentration):
                     # Update our particle's coordinate 
                     self.substance[sub_type][j] = next_pos_x
 
-            self.time += self.h
-            print("[INFO] Time: ", round(self.time,3))
+            # self.time += self.h
+            # print("[INFO] Time: ", round(self.time,3))
 
     # Sets all the plot condition on the graph
     def plot_condition(self,x,y,color,row = 0, col = 0):
@@ -99,28 +102,49 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
     def main(self):
 
-        # Here you can choose to switch between task A and task B initial state
-        self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state()
-        self.run_simulation()
+        for i in range(3):
 
-        # self.plot_solution(plot_2D=False)
-        # plt.savefig('diagram/plot_solution.png')
+            start  = time.process_time()
 
-        concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
+            self.substance = {"sub_1": [], "sub_2": []}
 
-        x_grid = np.linspace(-1,1,self.Nx)
-        
-        concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
+            # Here you can choose to switch between task A and task B initial state
+            self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state()
+            #print(len(self.substance["sub_1"]))
+   
+            self.run_simulation()
 
-        # self.concentration_plot(concentration_grid)
+            # self.plot_solution(plot_2D=False)
+            # plt.savefig('diagram/plot_solution.png')
 
-        #self.axes.scatter(*zip(*concentration_list), s=5, color="blue")
-        self.axes.plot(*zip(*concentration_list),'-bo', color="blue", markersize=3)
-        self.axes.plot(*zip(*self.data), color="red")
-        plt.savefig('diagram/concentration_plot.png')
+            concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
+
+            x_grid = np.linspace(-1,1,self.Nx)
+            
+            concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
+
+            # self.concentration_plot(concentration_grid)
+
+            #self.axes.scatter(*zip(*concentration_list), s=5, color="blue")
+            
+            self.axes.plot(*zip(*self.data), color="red")
+
+            if i == 0:
+                self.axes.plot(*zip(*concentration_list),'-bo', color="blue", markersize=3)
+                
+            if i == 1:
+                self.axes.plot(*zip(*concentration_list),'-go', color="green", markersize=3)
+
+            if i == 2:
+                self.axes.plot(*zip(*concentration_list),'-co', color="cyan", markersize=3)
+
+            plt.savefig('diagram/concentration_plot.png')
+            
+
+            print("[INFO] Simulation status : Success")
+            print("[INFO] The time taken to complete the simulation is {time}".format(time=(time.process_time() - start)))
+
         plt.show()
-
-        print("[INFO] Simulation status : Success")
 
         
 test = TaskA()
