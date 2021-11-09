@@ -56,7 +56,8 @@ class Concentration(Globals):
                     grid_list[0][n] = grid_list[0][n]/(grid_list[0][n] + n_sub_2)
 
                 except ZeroDivisionError:
-                    print("[WARN] ZeroDivisionError : Not enough particles to calculate")
+                    #print("[WARN] ZeroDivisionError : Not enough particles to calculate")
+                    pass
 
                 except IndexError:
                     print("[WARN] IndexError")
@@ -85,7 +86,7 @@ class Concentration(Globals):
                         grid_list[j][i] = grid_list[j][i]/(grid_list[j][i] + n_sub_2)
                     except ZeroDivisionError:
                         zero_div_err += 1
-                        print("[WARN] ZeroDivisionError : Not enough particles to calculate")
+                        #print("[WARN] ZeroDivisionError : Not enough particles to calculate")
 
                     except IndexError:
                         print("[WARN] IndexError: Out of boundaries at column {col}, row {row}".format(col=i, row=j))

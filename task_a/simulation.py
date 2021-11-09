@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib.colors
 import numpy as np
 import time
 
@@ -42,12 +43,14 @@ class TaskA(InitialState,SimulationMath,Concentration):
         
         u,v = 0, 0
 
+        print(self.substance["sub_1"])
         # Run the simulation until time ends
         for step in range(self.steps):
             if self.include_velocity:
                 for i, sub_type in enumerate(self.substance_list):
                     for j, coordinate in enumerate(self.substance[sub_type]):
                         x, y = coordinate[0], coordinate[1]
+                        
                         
                         u,v = self.bilinear_interpolation(x,y)
                         # Calculate using euler's equation
@@ -58,6 +61,7 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
                         # Update our particle's coordinate 
                         self.substance[sub_type][j] = (next_pos_x, next_pos_y)
+                        print("Particle {num} of {type} at {time}".format(num=j, type=sub_type, time=self.time))
 
             else:
                 for i, sub_type in enumerate(self.substance_list):
@@ -76,7 +80,6 @@ class TaskA(InitialState,SimulationMath,Concentration):
             self.time += self.h
             print("[INFO] Time: ", round(self.time,3))
 
-    # Sets all the plot condition on the graph
     def plot_condition(self,x,y,color,row = 0, col = 0):
 
         if row == 0 and col == 0:
@@ -111,9 +114,22 @@ class TaskA(InitialState,SimulationMath,Concentration):
     def concentration_plot(self, grid):
         print("[INFO] Creating concentration plot...")
 
-        # gist_ncar, seismic, coolwarm, brg
-        # https://matplotlib.org/stable/gallery/color/colormap_reference.html
-        sns.heatmap(grid, cmap='brg')
+        figure, axes = plt.subplots()
+
+        heatmap = axes.imshow(grid, extent=(self.xMin, self.xMax, self.yMin, self.yMax))
+
+        axes.set_title('Concentration Plot')
+        axes.set_xlabel('x')
+        axes.set_ylabel('y')
+
+        heatmap.set_cmap('brg')
+        figure.colorbar(matplotlib.cm.ScalarMappable(cmap='brg'))
+        # x_axis_labels = np.linspace(self.xMin, self.xMax, 10)
+        # y_axis_labels = np.linspace(self.yMin, self.yMax, 10)
+
+        # # gist_ncar, seismic, coolwarm, brg
+        # # https://matplotlib.org/stable/gallery/color/colormap_reference.html
+        # sns.heatmap(grid, cmap='brg', xticklabels=x_axis_labels, yticklabels=y_axis_labels)
 
 
     def main(self):

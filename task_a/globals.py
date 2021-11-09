@@ -18,7 +18,7 @@ class Globals:
         self.yMin = -1
         
         # Number of particles
-        self.Np = 150
+        self.Np = 7500
 
         # Diffusivity
         self.D = 0.01
