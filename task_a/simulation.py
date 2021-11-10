@@ -146,7 +146,7 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
         heatmap = axes.imshow(grid, extent=(self.xMin, self.xMax, self.yMin, self.yMax))
 
-        axes.set_title('Concentration Plot')
+        axes.set_title('Concentration Plot for time {num}'.format(num=self.tEnd))
         axes.set_xlabel('x')
         axes.set_ylabel('y')
 

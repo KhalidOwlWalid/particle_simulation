@@ -18,7 +18,7 @@ class Globals:
         self.yMin = -1
         
         # Number of particles
-        self.Np = 1500
+        self.Np = 150000
 
         # Diffusivity
         self.D = 0.1
@@ -26,13 +26,13 @@ class Globals:
         # Conditions
         self.h = 0.01
         self.time = 0.0
-        self.tEnd = 1
+        self.tEnd = 0.20
 
         self.steps = int(self.tEnd / self.h)
         
         # Grids
-        self.Nx = 80
-        self.Ny = 80
+        self.Nx = 100
+        self.Ny = 100
 
         # Create the particles
         self.x = np.random.uniform(low=-1, high=1, size=self.Np)

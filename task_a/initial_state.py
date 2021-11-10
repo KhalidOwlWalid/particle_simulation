@@ -46,5 +46,5 @@ class InitialState(Globals):
             else:
                 self.sub_2.append((self.x[i], self.y[i]))
 
-        return self.sub_1, self.sub_2
+        return np.array(self.sub_1), np.array(self.sub_2)
 

@@ -91,6 +91,8 @@ class Concentration(Globals):
                     except IndexError:
                         print("[WARN] IndexError: Out of boundaries at column {col}, row {row}".format(col=i, row=j))
 
+                    print("Grid {num}".format(num=(i,j)))
+
 
         print("[INFO] Number of empty pixels : {num}".format(num=zero_div_err))    
                         

@@ -8,10 +8,23 @@ import matplotlib.pyplot as plt
 import time
 
 # TODO: Make colors options for the user (in case of color blindness) by passing the dictionary accessors as function parameters.
+def generate_random_number(array_size):
+
+    x_rand = np.random.normal(0,1, array_size)
+    y_rand = np.random.normal(0,1, array_size)
+
+    random = np.stack((x_rand, y_rand), axis=1)
+
+    return random
+
 
 def diffuse(fluid_coordinates, velocities, dt):
     # TODO: Modify this formula to match the one in the slides.
-    fluid_coordinates += velocities * dt
+    random = generate_random_number(len(fluid_coordinates))
+    print(fluid_coordinates)
+    fluid_coordinates += velocities * dt + np.sqrt(2 * 0.1) * np.sqrt(0.01) * random
+
+    return fluid_coordinates
 
 def boundary_conditions(fluid_coordinates, x_min, x_max, y_min, y_max):
     # TODO: Remove these once there is a class with these variables.
@@ -155,7 +168,7 @@ N_x = 64
 N_y = 64
 
 t_max = 0.5 # Total simulation time.
-h = 0.001 # Time step.
+h = 0.01 # Time step.
 steps = int(t_max / h) + 1
 
 # Read vector field data from file.
@@ -166,7 +179,7 @@ spatial_field = cKDTree(field_coordinates)
 
 fluid_coordinates, fluid_particles = generate_random_particles(N_p, x_min, x_max, y_min, y_max)
 
-fluid_particles = add_circle(fluid_coordinates, fluid_particles, 0.4, -0.4, 0.4, get_value(color_dictionary, "blue"))
+fluid_particles = add_circle(fluid_coordinates, fluid_particles, 0.4, 0.4, 0.1, get_value(color_dictionary, "blue"))
 
 #fluid_particles = add_rectangle(fluid_coordinates, fluid_particles, -1, -1, 1, 2, get_value(color_dictionary, "blue"))
 
