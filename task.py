@@ -42,48 +42,6 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
         return next_pos_x, next_pos_y
 
-    # Runs the simulation 
-    # def run_simulation(self):
-        
-    #     u,v = 0, 0
-
-    #     print(self.substance["sub_1"])
-    #     # Run the simulation until time ends
-    #     for step in range(self.steps):
-    #         if self.include_velocity:
-    #             for i, sub_type in enumerate(self.substance_list):
-    #                 for j, coordinate in enumerate(self.substance[sub_type]):
-    #                     x, y = coordinate[0], coordinate[1]
-                        
-                        
-    #                     u,v = self.bilinear_interpolation(x,y)
-    #                     # Calculate using euler's equation
-    #                     next_pos_x = self.euler(x,vel = u ,vel_type=True)
-    #                     next_pos_y = self.euler(y, vel = v, vel_type=True)
-
-    #                     x, y = self.boundary_conditions(next_pos_x, next_pos_y)
-
-    #                     # Update our particle's coordinate 
-    #                     self.substance[sub_type][j] = (next_pos_x, next_pos_y)
-    #                     print("Particle {num} of {type} at {time}".format(num=j, type=sub_type, time=self.time))
-
-    #         else:
-    #             for i, sub_type in enumerate(self.substance_list):
-    #                 for j, coordinate in enumerate(self.substance[sub_type]):
-    #                     x, y = coordinate[0], coordinate[1]
-                        
-    #                     # Calculate using euler's equation
-    #                     next_pos_x = self.euler(x)
-    #                     next_pos_y = self.euler(y)
-
-    #                     x, y = self.boundary_conditions(next_pos_x, next_pos_y)
-
-    #                     # Update our particle's coordinate 
-    #                     self.substance[sub_type][j] = (next_pos_x, next_pos_y)
-
-    #         self.time += self.h
-    #         print("[INFO] Time: ", round(self.time,3))
-
     def run_simulation(self):
 
         for step in range(self.steps):
@@ -94,8 +52,8 @@ class TaskA(InitialState,SimulationMath,Concentration):
                     unknown, self.index = self.spatial_field.query(np.array(self.substance[sub_type]))
                     self.interpolated_velocities = self.vector_field_data[self.index]
  
-                    self.substance[sub_type][:,0] = self.euler(self.substance[sub_type][:,0], self.interpolated_velocities[:,0], len(self.substance[sub_type][:,0]))
-                    self.substance[sub_type][:,1] = self.euler(self.substance[sub_type][:,1], self.interpolated_velocities[:,1], len(self.substance[sub_type][:,1]))
+                    self.substance[sub_type][:,0] = self.euler_2D(self.substance[sub_type][:,0], self.interpolated_velocities[:,0], len(self.substance[sub_type][:,0]))
+                    self.substance[sub_type][:,1] = self.euler_2D(self.substance[sub_type][:,1], self.interpolated_velocities[:,1], len(self.substance[sub_type][:,1]))
 
             else:
                 for i, sub_type in enumerate(self.substance_list):
@@ -104,8 +62,8 @@ class TaskA(InitialState,SimulationMath,Concentration):
                     unknown, self.index = self.spatial_field.query(np.array(self.substance[sub_type]))
                     self.interpolated_velocities = self.vector_field_data[self.index]
  
-                    self.substance[sub_type][:,0] = self.euler_test(self.substance[sub_type][:,0], len(self.substance[sub_type][:,0]))
-                    self.substance[sub_type][:,1] = self.euler_test(self.substance[sub_type][:,1], len(self.substance[sub_type][:,1]))
+                    self.substance[sub_type][:,0] = self.euler_2D(self.substance[sub_type][:,0], len(self.substance[sub_type][:,0]))
+                    self.substance[sub_type][:,1] = self.euler_2D(self.substance[sub_type][:,1], len(self.substance[sub_type][:,1]))
 
 
     def plot_condition(self,x,y,color,row = 0, col = 0):
@@ -199,5 +157,136 @@ class TaskA(InitialState,SimulationMath,Concentration):
         self.run_simulation()
         #print(np.array(self.substance["sub_1"]))
 
+class TaskB(InitialState,SimulationMath,Concentration):
 
-TaskA().main()
+    def __init__(self):
+        super().__init__()
+
+        self.substance = {"sub_1": [], "sub_2": []}
+        self.substance_list = ["sub_1", "sub_2"]
+
+        
+        self.figure, self.axes = plt.subplots()
+
+    # Checks if a particle is going outside the boundary
+    def boundary_conditions(self, next_pos_x):
+
+        if next_pos_x > 1:
+            distanceFromMax = next_pos_x - self.xMax
+            next_pos_x = next_pos_x - 2 * distanceFromMax
+
+        elif next_pos_x < -1:
+            distanceFromMax = next_pos_x - self.xMin
+            next_pos_x = next_pos_x - 2 * distanceFromMax
+
+        return next_pos_x
+
+    # Runs the simulation 
+    def run_simulation(self):
+        
+        u,v = 0, 0
+
+        # Run the simulation until time ends
+        for step in range(self.steps):
+        
+            for i, sub_type in enumerate(self.substance_list):
+                for j, coordinate in enumerate(self.substance[sub_type]):
+                    x = coordinate
+                    
+                    # Calculate using euler's equation
+                    next_pos_x = self.euler_1D(x)
+
+                    x = self.boundary_conditions(next_pos_x)
+
+                    # Update our particle's coordinate 
+                    self.substance[sub_type][j] = next_pos_x
+
+    # Sets all the plot condition on the graph
+    def plot_condition(self,x,y,color,row = 0, col = 0):
+
+        if row == 0 and col == 0:
+            self.axes.set_xbound(lower=self.xMin, upper=self.xMax)
+            self.axes.set_xlim(xmin=self.xMin, xmax=self.xMax)
+            self.axes.set_ybound(lower=self.yMin, upper=self.yMax)
+            self.axes.set_ylim(ymin=self.yMin, ymax=self.yMax)
+            self.axes.scatter(x,y, s=self.size, c=color)
+            
+    # Obviously
+    def plot_solution(self, plot_2D=True):
+
+        if plot_2D:
+            for i, sub_type in enumerate(self.substance_list):
+                
+                color = None 
+                print("Plotting for ", sub_type)
+
+                for j, coordinate in enumerate(self.substance[sub_type]):
+                    
+                    # Set the color of substance 1 as blue, and red otherwise
+                    if sub_type == "sub_1":
+                        color = "blue"
+                    else:
+                        color = "red"
+
+                    x, y = coordinate[0], coordinate[1]
+
+                    self.plot_condition(x,y, color)
+        else:
+            pass
+    
+    # This produces a pixelated concentration plot
+    def concentration_plot(self, grid):
+        print("[INFO] Creating concentration plot...")
+        sns.heatmap(grid, cmap='RdBu')
+
+    def save_to_txt(self,array):
+
+        for element in array: #you wouldn't need to write this since you are already in a loop
+            file1 = open("observed_data/observed_concentration_v3.txt","a") 
+            file1.write("{x_avg} {concentration}\n".format(x_avg=round(element[0], 7), concentration=element[1])) 
+            file1.close()
+
+    def main(self):
+
+        for i in range(3):
+
+            start  = time.process_time()
+
+            self.substance = {"sub_1": [], "sub_2": []}
+
+            # Here you can choose to switch between task A and task B initial state
+            self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state()
+            #print(len(self.substance["sub_1"]))
+   
+            self.run_simulation()
+
+            # self.plot_solution(plot_2D=False)
+            # plt.savefig('diagram/plot_solution.png')
+
+            concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
+
+            x_grid = np.linspace(-1,1,self.Nx)
+            
+            concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
+            
+            self.axes.plot(*zip(*self.data), color="red")
+
+            if i == 0:
+                self.axes.plot(*zip(*concentration_list),'-bo', color="blue", markersize=3)
+                
+            if i == 1:
+                self.axes.plot(*zip(*concentration_list),'-go', color="green", markersize=3)
+
+            if i == 2:
+                self.axes.plot(*zip(*concentration_list),'-co', color="cyan", markersize=3)
+
+            plt.savefig('diagram/concentration_plot.png')
+            
+
+            print("[INFO] Simulation status : Success")
+            print("[INFO] The time taken to complete the simulation is {time}".format(time=(time.process_time() - start)))
+
+        plt.show()
+
+test = TaskB()
+test.main()
