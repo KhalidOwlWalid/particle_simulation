@@ -62,6 +62,45 @@ class Concentration(Globals):
                 except IndexError:
                     print("[WARN] IndexError")
                 
+        elif Globals().task_type[Globals().task] == 2:
+
+            for i in range(self.Nx - 1):
+                grid_list.append([0 for j in range(self.Ny - 1)])
+
+            for i in range(len(self.x_grid)- 1):
+                for j in range(len(self.y_grid) - 1):
+
+                    n_sub_2 = 0
+
+                    for particle in sub_1:
+                        # Check corner
+                        if grid_position(particle[0], particle[1], i, j):
+                            grid_list[j][i] += 1
+                            
+                    for particle in sub_2:
+                        
+                        # Check corner
+                        if grid_position(particle[0], particle[1], i, j):
+                            n_sub_2 += 1
+                    try:
+                        grid_concentration = grid_list[j][i]/(grid_list[j][i] + n_sub_2)
+
+                        if grid_concentration > 0.3:
+                            grid_list[j][i] = grid_concentration
+
+                        elif grid_concentration < 0.3:
+                            grid_list[j][i] = 0
+
+                    # There will be grids where it is empty
+                    except ZeroDivisionError:
+                        zero_div_err += 1
+                        #print("[WARN] ZeroDivisionError : Not enough particles to calculate")
+
+                    # At one point , our calculation might go out of boundary
+                    except IndexError:
+                        print("[WARN] IndexError: Out of boundaries at column {col}, row {row}".format(col=(i+1), row=(j+1)))
+
+                    print("Grid {num}".format(num=(i,j)))
 
         else:
             for i in range(self.Nx - 1):

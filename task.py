@@ -128,8 +128,8 @@ class TaskA(InitialState,SimulationMath,Concentration):
         print("[INFO] Running the simulation...")
         self.run_simulation()
 
-        print("[INFO] Plotting the solution for time : {solution}".format(solution=self.tEnd))
-        self.plot_solution()
+        # print("[INFO] Plotting the solution for time : {solution}".format(solution=self.tEnd))
+        # self.plot_solution()
 
         concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
 
@@ -142,10 +142,6 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
         plt.show()
 
-    def test(self):
-        self.substance["sub_1"], self.substance["sub_2"] = self.taskA_initial_state()
-        self.run_simulation()
-        #print(np.array(self.substance["sub_1"]))
 
 class TaskB(InitialState,SimulationMath,Concentration):
 
@@ -156,8 +152,6 @@ class TaskB(InitialState,SimulationMath,Concentration):
         self.substance_list = ["sub_1", "sub_2"]
 
         self.Ny = 1
-
-        self.figure, self.axes = plt.subplots()
 
     # Checks if a particle is going outside the boundary
     def boundary_conditions(self, next_pos_x):
@@ -263,6 +257,8 @@ class TaskB(InitialState,SimulationMath,Concentration):
             
             concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
             
+            self.figure, self.axes = plt.subplots()
+
             if i == 0:
                 ref_sol = self.axes.plot(*zip(*self.data), color="red", label='Reference Solution')
                 run_1 = self.axes.plot(*zip(*concentration_list),'-bo', color="blue", markersize=3, label='Run 1')
@@ -279,11 +275,62 @@ class TaskB(InitialState,SimulationMath,Concentration):
             self.axes.set_title('1D Diffusion Problem')
             self.axes.set_xlabel('x')
             self.axes.set_ylabel('Concentration')
-            
+
             plt.savefig('diagram/task_b_run.png')
             
             
             print("[INFO] Simulation status : Success")
             print("[INFO] The time taken to complete the simulation is {time}".format(time=(time.process_time() - start)))
+
+        plt.show()
+
+class TaskD(TaskA):
+
+    def __init__(self):
+        super().__init__()
+
+        # Initial condition for task D
+        self.offset_x = 0.4
+        self.offset_y = 0.4
+        self.radius = 0.1
+        self.D = 0.1
+        self.include_velocity = True
+
+    def concentration_plot(self, grid):
+
+        print("[INFO] Creating concentration plot...")
+
+        figure, axes = plt.subplots()
+
+        heatmap = axes.imshow(grid, extent=(self.xMin, self.xMax, self.yMin, self.yMax))
+
+        axes.set_title('Chemical Concentration for time {num}'.format(num=self.tEnd))
+        axes.set_xlabel('x')
+        axes.set_ylabel('y')
+
+        heatmap.set_cmap('brg')
+        figure.colorbar(matplotlib.cm.ScalarMappable(cmap='brg'))
+
+    def main_task_D(self):
+
+        start = time.process_time()
+
+        self.substance["sub_1"], self.substance["sub_2"] = self.taskA_initial_state()
+
+        print("[INFO] Running the simulation...")
+        self.run_simulation()
+
+        # print("[INFO] Plotting the solution for time : {solution}".format(solution=self.tEnd))
+        self.plot_solution()
+
+        concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
+
+        self.concentration_plot(concentration_grid)
+        print(concentration_grid)
+        plt.savefig('diagram/concentration_plot.png')
+
+        print("The number of particles involved: ", (len(self.substance["sub_1"]) + len(self.substance["sub_2"])))
+        print("[INFO] Simulation status : Success")
+        print("[INFO] The time taken to complete the simulation is {time}".format(time=(time.process_time() - start)))
 
         plt.show()
