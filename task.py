@@ -19,7 +19,7 @@ class TaskA(InitialState,SimulationMath,Concentration):
         self.field_coordinates, self.vector_field_data = self.read_data_file('data_file/velocityCMM3.dat', [0,1], [2,3])
         self.spatial_field = cKDTree(self.field_coordinates)
 
-        self.figure, self.axes = plt.subplots()
+        
 
     # Checks if a particle is going outside the boundary
     def boundary_conditions(self, next_pos_x, next_pos_y):
@@ -47,23 +47,21 @@ class TaskA(InitialState,SimulationMath,Concentration):
         for step in range(self.steps):
             if self.include_velocity:
                 for i, sub_type in enumerate(self.substance_list):
-                    
-                    print(self.substance[sub_type])
+
                     unknown, self.index = self.spatial_field.query(np.array(self.substance[sub_type]))
                     self.interpolated_velocities = self.vector_field_data[self.index]
  
-                    self.substance[sub_type][:,0] = self.euler_2D(self.substance[sub_type][:,0], self.interpolated_velocities[:,0], len(self.substance[sub_type][:,0]))
-                    self.substance[sub_type][:,1] = self.euler_2D(self.substance[sub_type][:,1], self.interpolated_velocities[:,1], len(self.substance[sub_type][:,1]))
+                    self.substance[sub_type][:,0] = self.euler_2D(self.substance[sub_type][:,0], velocity=self.interpolated_velocities[:,0], array_size=len(self.substance[sub_type][:,0]))
+                    self.substance[sub_type][:,1] = self.euler_2D(self.substance[sub_type][:,1],  velocity=self.interpolated_velocities[:,1], array_size=len(self.substance[sub_type][:,1]))
 
             else:
                 for i, sub_type in enumerate(self.substance_list):
-                    
-                    print(self.substance[sub_type])
+
                     unknown, self.index = self.spatial_field.query(np.array(self.substance[sub_type]))
                     self.interpolated_velocities = self.vector_field_data[self.index]
  
-                    self.substance[sub_type][:,0] = self.euler_2D(self.substance[sub_type][:,0], len(self.substance[sub_type][:,0]))
-                    self.substance[sub_type][:,1] = self.euler_2D(self.substance[sub_type][:,1], len(self.substance[sub_type][:,1]))
+                    self.substance[sub_type][:,0] = self.euler_2D(self.substance[sub_type][:,0],velocity=0, array_size=len(self.substance[sub_type][:,0]))
+                    self.substance[sub_type][:,1] = self.euler_2D(self.substance[sub_type][:,1], velocity=0, array_size=len(self.substance[sub_type][:,1]))
 
 
     def plot_condition(self,x,y,color,row = 0, col = 0):
@@ -77,6 +75,8 @@ class TaskA(InitialState,SimulationMath,Concentration):
             
     # Obviously
     def plot_solution(self, plot_2D=True):
+        
+        self.figure, self.axes = plt.subplots()
 
         if plot_2D:
             for i, sub_type in enumerate(self.substance_list):
@@ -110,12 +110,6 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
         heatmap.set_cmap('brg')
         figure.colorbar(matplotlib.cm.ScalarMappable(cmap='brg'))
-        # x_axis_labels = np.linspace(self.xMin, self.xMax, 10)
-        # y_axis_labels = np.linspace(self.yMin, self.yMax, 10)
-
-        # # gist_ncar, seismic, coolwarm, brg
-        # # https://matplotlib.org/stable/gallery/color/colormap_reference.html
-        # sns.heatmap(grid, cmap='brg', xticklabels=x_axis_labels, yticklabels=y_axis_labels)
 
     def save_to_txt(self,array):
 
@@ -136,13 +130,9 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
         print("[INFO] Plotting the solution for time : {solution}".format(solution=self.tEnd))
         self.plot_solution()
-        fig1 = plt.figure()
 
         concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
-        
-        print(concentration_grid)
 
-        self.save_to_txt(concentration_grid)
         self.concentration_plot(concentration_grid)
         plt.savefig('diagram/concentration_plot.png')
 
@@ -165,7 +155,8 @@ class TaskB(InitialState,SimulationMath,Concentration):
         self.substance = {"sub_1": [], "sub_2": []}
         self.substance_list = ["sub_1", "sub_2"]
 
-        
+        self.Ny = 1
+
         self.figure, self.axes = plt.subplots()
 
     # Checks if a particle is going outside the boundary
@@ -248,6 +239,8 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
     def main(self):
 
+        self.data = self.extract_data()
+
         for i in range(3):
 
             start  = time.process_time()
@@ -287,6 +280,3 @@ class TaskB(InitialState,SimulationMath,Concentration):
             print("[INFO] The time taken to complete the simulation is {time}".format(time=(time.process_time() - start)))
 
         plt.show()
-
-test = TaskB()
-test.main()

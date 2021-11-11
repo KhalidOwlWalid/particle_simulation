@@ -6,7 +6,10 @@ class Globals:
 
     def __init__(self):
 
-        # Substance Attribtue
+        self.task_type = {'A':0, 'B':1, 'C':2}
+        self.task = 'B'
+
+        # Substance Attribute
         self.radius = 0.1
         self.offset_x = 0.4
         self.offset_y = 0.4
@@ -26,13 +29,13 @@ class Globals:
         # Conditions
         self.h = 0.01
         self.time = 0.0
-        self.tEnd = 0.20
+        self.tEnd = 0.2
 
         self.steps = int(self.tEnd / self.h)
         
         # Grids
-        self.Nx = 100
-        self.Ny = 1
+        self.Nx = 64
+        self.Ny = 20
 
         # Create the particles
         self.x = np.random.uniform(low=-1, high=1, size=self.Np)
