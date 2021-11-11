@@ -13,15 +13,15 @@ class SimulationMath(Globals):
     def read_data_file(self, file, *args):
         return [np.loadtxt(file, usecols=tuple(c)) for c in args]
     
-    def extract_data(self):
+    def extract_data(self, file):
 
         data = []
 
         n_line = 0
             
-        if self.velocity_file == "data_file/reference_solution_1D.dat":
+        if file == "data_file/reference_solution_1D.dat":
 
-            for line in open(self.velocity_file , 'r'):
+            for line in open(file , 'r'):
                 
                 if line == "\n":
                     n_line += 1
@@ -29,7 +29,7 @@ class SimulationMath(Globals):
                     lines = [i for i in line.split()]
                     data.append((float(lines[0]), float(lines[1])))
 
-        print("[INFO] Extracting data from {name}".format(name=self.velocity_file))
+        print("[INFO] Extracting data from {name}".format(name=file))
         print("[INFO] There is {num} empty lines".format(num=n_line))
 
         return data

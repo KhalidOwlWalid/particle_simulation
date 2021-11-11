@@ -239,7 +239,8 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
     def main(self):
 
-        self.data = self.extract_data()
+        file = 'data_file/reference_solution_1D.dat'
+        self.data = self.extract_data(file)
 
         for i in range(3):
 
@@ -262,20 +263,26 @@ class TaskB(InitialState,SimulationMath,Concentration):
             
             concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
             
-            self.axes.plot(*zip(*self.data), color="red")
-
             if i == 0:
-                self.axes.plot(*zip(*concentration_list),'-bo', color="blue", markersize=3)
-                
+                ref_sol = self.axes.plot(*zip(*self.data), color="red", label='Reference Solution')
+                run_1 = self.axes.plot(*zip(*concentration_list),'-bo', color="blue", markersize=3, label='Run 1')
+                self.axes.legend()
+
             if i == 1:
-                self.axes.plot(*zip(*concentration_list),'-go', color="green", markersize=3)
+                run_2 = self.axes.plot(*zip(*concentration_list),'-go', color="green", markersize=3, label='Run 2')
+                self.axes.legend()
 
             if i == 2:
-                self.axes.plot(*zip(*concentration_list),'-co', color="cyan", markersize=3)
+                run_3 = self.axes.plot(*zip(*concentration_list),'-co', color="cyan", markersize=3, label='Run 3')
+                self.axes.legend()
 
-            plt.savefig('diagram/concentration_plot.png')
+            self.axes.set_title('1D Diffusion Problem')
+            self.axes.set_xlabel('x')
+            self.axes.set_ylabel('Concentration')
             
-
+            plt.savefig('diagram/task_b_run.png')
+            
+            
             print("[INFO] Simulation status : Success")
             print("[INFO] The time taken to complete the simulation is {time}".format(time=(time.process_time() - start)))
 

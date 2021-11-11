@@ -21,7 +21,7 @@ class Globals:
         self.yMin = -1
         
         # Number of particles
-        self.Np = 15000
+        self.Np = 16684
 
         # Diffusivity
         self.D = 0.1
@@ -34,7 +34,7 @@ class Globals:
         self.steps = int(self.tEnd / self.h)
         
         # Grids
-        self.Nx = 64
+        self.Nx = 100
         self.Ny = 20
 
         # Create the particles
@@ -43,8 +43,6 @@ class Globals:
 
         # For size of scatter plots, increase the value to get bigger scatter size
         self.size = 10
-
-        self.velocity_file = 'data_file/reference_solution_1D.dat'
 
         self.include_velocity = True
 
