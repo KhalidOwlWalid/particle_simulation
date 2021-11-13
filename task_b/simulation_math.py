@@ -8,7 +8,7 @@ class SimulationMath(Globals):
 
     def __init__(self):
         super().__init__()
-        self.data = []
+        self.ref_sol = []
         self.extract_data()
         
     def extract_data(self):
@@ -21,12 +21,12 @@ class SimulationMath(Globals):
                 n_line += 1
             else:
                 lines = [i for i in line.split()]
-                self.data.append((float(lines[0]), float(lines[1])))
+                self.ref_sol.append((float(lines[0]), float(lines[1])))
 
         print("[INFO] Extracting data from {name}".format(name=self.velocity_file))
         print("[INFO] There is {num} empty lines".format(num=n_line))
 
-        return self.data
+        return self.ref_sol
 
     def euler(self, x_coordinate):
 

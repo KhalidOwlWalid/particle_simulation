@@ -6,6 +6,7 @@ import time
 from simulation_math import SimulationMath
 from initial_state import InitialState
 from concentration import Concentration
+from sklearn.metrics import mean_squared_error
 
 class TaskA(InitialState,SimulationMath,Concentration):
 
@@ -127,7 +128,7 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
             #self.axes.scatter(*zip(*concentration_list), s=5, color="blue")
             
-            self.axes.plot(*zip(*self.data), color="red")
+            self.axes.plot(*zip(*self.ref_sol), color="red")
 
             if i == 0:
                 self.axes.plot(*zip(*concentration_list),'-bo', color="blue", markersize=3)
@@ -146,8 +147,42 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
         plt.show()
 
-        
-test = TaskA()
+    def rmse_plot(self):
 
+            start  = time.process_time()
+
+            self.substance = {"sub_1": [], "sub_2": []}
+
+            # Here you can choose to switch between task A and task B initial state
+            self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state()
+            #print(len(self.substance["sub_1"]))
+   
+            self.run_simulation()
+
+            # self.plot_solution(plot_2D=False)
+            # plt.savefig('diagram/plot_solution.png')
+
+            concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
+
+            x_grid = np.linspace(-1,1,self.Nx)
+            
+            # concentration_list = [(avg_x,)]
+            concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
+
+
+            # Convert list of tuples into a 2D array
+            observed_data = np.array(*[concentration_list])
+            reference_solution = np.array(*[self.ref_sol])
+
+            actual_concentration = observed_data[:,1]
+            predicted_concentration = np.interp(observed_data[:,0], reference_solution[:,0], reference_solution[:,1])
+
+            RMSE = mean_squared_error(predicted_concentration, actual_concentration, squared=False)
+
+            print("The RMSE value with time step {time_step} is {value}".format(time_step=self.h, value=RMSE))
+
+
+test = TaskA()
+test.rmse_plot()
 test.main()
 
