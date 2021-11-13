@@ -11,15 +11,15 @@ class InitialState(Globals):
         
         super().__init__()
    
-    def taskB_initial_state(self):
+    def taskB_initial_state(self, Np):
 
         toTheLeft = lambda coordinate : coordinate <= 0
-
+        self.x = np.random.uniform(low=-1, high=1, size=Np)
         self.sub_1 = []
         self.sub_2 = []
 
         # Divide the particles into their substance type
-        for i in range(self.Np):
+        for i in range(Np):
             
             # If the position of the particle is within a circle of radius 1 centred at the origin, add the particle as substance 1
             if toTheLeft(self.x[i]): 
@@ -30,4 +30,4 @@ class InitialState(Globals):
                 self.sub_2.append(self.x[i])
 
         print((len(self.sub_1) + len(self.sub_2)))
-        return self.sub_1, self.sub_2
+        return np.array(self.sub_1), np.array(self.sub_2)

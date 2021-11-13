@@ -22,12 +22,10 @@ class Globals:
         self.D = 0.1
 
         # Conditions
-        self.h = 0.001
+        self.h = 0.1
         self.time = 0.0
         self.tEnd = 0.2
 
-        self.steps = int(self.tEnd / self.h)
-        
         # Grids
         self.Nx = 64
         self.Ny = 1
@@ -40,7 +38,9 @@ class Globals:
 
         self.velocity_file = 'data_file/reference_solution_1D.dat'
 
-        self.Np_list = [1500, 15000, 150000]
+        self.Np_list = np.arange(15000,150000,10000)
+        # self.h_list = [0.1, 0.01, 0.001]
+        self.h_list = np.linspace(0.1,0.0001, 50)
 
 
         

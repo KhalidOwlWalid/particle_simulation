@@ -33,20 +33,20 @@ class TaskA(InitialState,SimulationMath,Concentration):
         return next_pos_x
 
     # Runs the simulation 
-    def run_simulation(self):
+    def run_simulation(self, time_step=0.01):
         
-        u,v = 0, 0
+        self.steps = int(self.tEnd / time_step)
 
+        u,v = 0,0
         # Run the simulation until time ends
         for step in range(self.steps):
             
-
             for i, sub_type in enumerate(self.substance_list):
                 for j, coordinate in enumerate(self.substance[sub_type]):
                     x = coordinate
                     
                     # Calculate using euler's equation
-                    next_pos_x = self.euler(x)
+                    next_pos_x = self.euler(x, time_step)
 
                     x = self.boundary_conditions(next_pos_x)
 
@@ -55,6 +55,22 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
             # self.time += self.h
             # print("[INFO] Time: ", round(self.time,3))
+
+    def run_simulation(self, time_step=0.01):
+        
+        self.steps = int(self.tEnd / time_step)
+
+        u,v = 0,0
+        # Run the simulation until time ends
+        for step in range(self.steps):
+            
+            for i, sub_type in enumerate(self.substance_list):
+ 
+                self.substance[sub_type] = self.euler(self.substance[sub_type], len(self.substance[sub_type]), time_step=time_step)
+
+            # self.time += self.h
+            # print("[INFO] Time: ", round(self.time,3))
+
 
     # Sets all the plot condition on the graph
     def plot_condition(self,x,y,color,row = 0, col = 0):
@@ -97,7 +113,7 @@ class TaskA(InitialState,SimulationMath,Concentration):
     def save_to_txt(self,array):
 
         for element in array: #you wouldn't need to write this since you are already in a loop
-            file1 = open("observed_data/observed_concentration_v3.txt","a") 
+            file1 = open("observed_data/observed_concentration_v2.txt","a") 
             file1.write("{x_avg} {concentration}\n".format(x_avg=round(element[0], 7), concentration=element[1])) 
             file1.close()
 
@@ -111,9 +127,8 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
             # Here you can choose to switch between task A and task B initial state
             self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state()
-            #print(len(self.substance["sub_1"]))
    
-            self.run_simulation()
+            self.run_simulation(time_step=self.h)
 
             # self.plot_solution(plot_2D=False)
             # plt.savefig('diagram/plot_solution.png')
@@ -124,10 +139,6 @@ class TaskA(InitialState,SimulationMath,Concentration):
             
             concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
 
-            # self.concentration_plot(concentration_grid)
-
-            #self.axes.scatter(*zip(*concentration_list), s=5, color="blue")
-            
             self.axes.plot(*zip(*self.ref_sol), color="red")
 
             if i == 0:
@@ -149,15 +160,20 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
     def rmse_plot(self):
 
+        plot_test = []
+
+        for n in self.Np_list:
+
             start  = time.process_time()
 
             self.substance = {"sub_1": [], "sub_2": []}
 
             # Here you can choose to switch between task A and task B initial state
-            self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state()
+            self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state(n)
             #print(len(self.substance["sub_1"]))
-   
-            self.run_simulation()
+            print(self.substance["sub_1"])
+
+            self.run_simulation(time_step=0.01)
 
             # self.plot_solution(plot_2D=False)
             # plt.savefig('diagram/plot_solution.png')
@@ -166,9 +182,15 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
             x_grid = np.linspace(-1,1,self.Nx)
             
-            # concentration_list = [(avg_x,)]
+            # concentration_list = [(avg_x,concentration)]
             concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
-
+            
+        
+            if n == 145000:
+                # self.save_to_txt(concentration_list)
+                self.axes.plot(*zip(*self.ref_sol), color="red")
+                self.axes.plot(*zip(*concentration_list),'-bo', color="blue", markersize=3)
+                plt.show()
 
             # Convert list of tuples into a 2D array
             observed_data = np.array(*[concentration_list])
@@ -179,10 +201,19 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
             RMSE = mean_squared_error(predicted_concentration, actual_concentration, squared=False)
 
-            print("The RMSE value with time step {time_step} is {value}".format(time_step=self.h, value=RMSE))
+            print("The RMSE value with time step {time_step} is {value}".format(time_step=0.01, value=RMSE))
 
+            plot_test.append((n, RMSE))
+
+        # plt.yscale('log')
+        # plt.xscale('log')
+        # plt.scatter(*zip(*plot_test))
+
+        print(plot_test)
+
+        plt.show()
 
 test = TaskA()
 test.rmse_plot()
-test.main()
+# test.main()
 

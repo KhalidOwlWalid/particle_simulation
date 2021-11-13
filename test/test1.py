@@ -31,12 +31,14 @@ reference_solution = extract('data_file/reference_solution_1D.dat')
 
 spatial_field = cKDTree(reference_solution)
 
-observed_data = extract('observed_data/observed_concentration_v1.txt')
+observed_data = extract('observed_data/observed_concentration_v2.txt')
 
 actual_concentration = observed_data[:,1]
 predicted_concentration = np.interp(observed_data[:,0], reference_solution[:,0], reference_solution[:,1])
 
 RMSE = mean_squared_error(predicted_concentration, actual_concentration, squared=False)
+
+print(RMSE)
 
 
 
