@@ -37,20 +37,20 @@ class SimulationMath(Globals):
     def generate_random_number(self, array_size):
         return np.random.normal(0,1, array_size)
 
-    def euler_2D(self, coordinate, velocity, array_size):
+    def euler(self, coordinate, velocity, array_size):
         
         # This causes the grid to be moved to 
         random = self.generate_random_number(array_size)
 
         return coordinate + velocity * self.h + np.sqrt(2 * self.D) * np.sqrt(self.h) * random
 
-    def euler_1D(self, x_coordinate):
+    # def euler_1D(self, x_coordinate):
 
-        random = np.random.normal(0,1,1)
+    #     random = np.random.normal(0,1,1)
 
-        euler_func = lambda coordinate : coordinate + np.sqrt(2 * self.D) * np.sqrt(self.h) * random[0]
+    #     euler_func = lambda coordinate : coordinate + np.sqrt(2 * self.D) * np.sqrt(self.h) * random[0]
 
-        next_x_pos = euler_func(x_coordinate)
+    #     next_x_pos = euler_func(x_coordinate)
 
-        return next_x_pos
+    #     return next_x_pos
     

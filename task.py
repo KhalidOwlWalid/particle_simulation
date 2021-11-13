@@ -4,6 +4,7 @@ import matplotlib.colors
 import numpy as np
 import time
 from scipy.spatial import cKDTree
+from sklearn.metrics import mean_squared_error
 
 from simulation_math import SimulationMath
 from initial_state import InitialState
@@ -52,8 +53,8 @@ class TaskA(InitialState,SimulationMath,Concentration):
                     unknown, self.index = self.spatial_field.query(np.array(self.substance[sub_type]))
                     self.interpolated_velocities = self.vector_field_data[self.index]
  
-                    self.substance[sub_type][:,0] = self.euler_2D(self.substance[sub_type][:,0], velocity=self.interpolated_velocities[:,0], array_size=len(self.substance[sub_type][:,0]))
-                    self.substance[sub_type][:,1] = self.euler_2D(self.substance[sub_type][:,1],  velocity=self.interpolated_velocities[:,1], array_size=len(self.substance[sub_type][:,1]))
+                    self.substance[sub_type][:,0] = self.euler(self.substance[sub_type][:,0], velocity=self.interpolated_velocities[:,0], array_size=len(self.substance[sub_type][:,0]))
+                    self.substance[sub_type][:,1] = self.euler(self.substance[sub_type][:,1],  velocity=self.interpolated_velocities[:,1], array_size=len(self.substance[sub_type][:,1]))
 
             else:
                 for i, sub_type in enumerate(self.substance_list):
@@ -61,8 +62,8 @@ class TaskA(InitialState,SimulationMath,Concentration):
                     unknown, self.index = self.spatial_field.query(np.array(self.substance[sub_type]))
                     self.interpolated_velocities = self.vector_field_data[self.index]
  
-                    self.substance[sub_type][:,0] = self.euler_2D(self.substance[sub_type][:,0],velocity=0, array_size=len(self.substance[sub_type][:,0]))
-                    self.substance[sub_type][:,1] = self.euler_2D(self.substance[sub_type][:,1], velocity=0, array_size=len(self.substance[sub_type][:,1]))
+                    self.substance[sub_type][:,0] = self.euler(self.substance[sub_type][:,0],velocity=0, array_size=len(self.substance[sub_type][:,0]))
+                    self.substance[sub_type][:,1] = self.euler(self.substance[sub_type][:,1], velocity=0, array_size=len(self.substance[sub_type][:,1]))
 
 
     def plot_condition(self,x,y,color,row = 0, col = 0):
@@ -153,6 +154,7 @@ class TaskB(InitialState,SimulationMath,Concentration):
         self.substance_list = ["sub_1", "sub_2"]
 
         self.Ny = 1
+        self.Np_list = np.arange(1000, 200000, 1000)
 
     # Checks if a particle is going outside the boundary
     def boundary_conditions(self, next_pos_x):
@@ -176,16 +178,8 @@ class TaskB(InitialState,SimulationMath,Concentration):
         for step in range(self.steps):
         
             for i, sub_type in enumerate(self.substance_list):
-                for j, coordinate in enumerate(self.substance[sub_type]):
-                    x = coordinate
-                    
-                    # Calculate using euler's equation
-                    next_pos_x = self.euler_1D(x)
 
-                    x = self.boundary_conditions(next_pos_x)
-
-                    # Update our particle's coordinate 
-                    self.substance[sub_type][j] = next_pos_x
+                self.substance[sub_type] = self.euler(self.substance[sub_type], velocity=0, array_size=len(self.substance[sub_type]))
 
     # Sets all the plot condition on the graph
     def plot_condition(self,x,y,color,row = 0, col = 0):
@@ -235,55 +229,81 @@ class TaskB(InitialState,SimulationMath,Concentration):
     def main(self):
 
         file = 'data_file/reference_solution_1D.dat'
-        self.data = self.extract_data(file)
+        self.ref_sol= self.extract_data(file)
+        self.figure, self.axes = plt.subplots()
 
-        for i in range(3):
+        plot_dict = {'marker':["-bo", "-go", "-co"], 'label':['Run 1', 'Run 2', 'Run 3'], 'color':['blue', 'green', 'cyan']}
+        plot_test = []
 
-            start  = time.process_time()
+        if self.plot_1D == True:
 
-            self.substance = {"sub_1": [], "sub_2": []}
+            for i, run in enumerate(plot_dict['label']):
 
-            # Here you can choose to switch between task A and task B initial state
-            self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state()
-            #print(len(self.substance["sub_1"]))
-   
-            self.run_simulation()
+                start  = time.process_time()
 
-            # self.plot_solution(plot_2D=False)
-            # plt.savefig('diagram/plot_solution.png')
+                self.substance = {"sub_1": [], "sub_2": []}
 
-            concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
+                # Here you can choose to switch between task A and task B initial state
+                self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state(self.Np)
+                #print(len(self.substance["sub_1"]))
+    
+                self.run_simulation()
 
-            x_grid = np.linspace(-1,1,self.Nx)
-            
-            concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
-            
-            self.figure, self.axes = plt.subplots()
+                concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
 
-            if i == 0:
-                ref_sol = self.axes.plot(*zip(*self.data), color="red", label='Reference Solution')
-                run_1 = self.axes.plot(*zip(*concentration_list),'-bo', color="blue", markersize=3, label='Run 1')
+                x_grid = np.linspace(-1,1,self.Nx)
+
+                concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
+
+                if i == 0:
+                    self.axes.plot(*zip(*self.ref_sol), color="red", label='Reference Solution')
+                
+                self.axes.plot(*zip(*concentration_list),plot_dict['marker'][i], color=plot_dict['color'][i], markersize=3, label=run)
                 self.axes.legend()
 
-            if i == 1:
-                run_2 = self.axes.plot(*zip(*concentration_list),'-go', color="green", markersize=3, label='Run 2')
-                self.axes.legend()
+                self.axes.set_title('1D Diffusion Problem')
+                self.axes.set_xlabel('x')
+                self.axes.set_ylabel('Concentration')
 
-            if i == 2:
-                run_3 = self.axes.plot(*zip(*concentration_list),'-co', color="cyan", markersize=3, label='Run 3')
-                self.axes.legend()
+                print("[INFO] Simulation status : Success")
+                print("[INFO] The time taken to complete the simulation is {time}".format(time=(time.process_time() - start)))
 
-            self.axes.set_title('1D Diffusion Problem')
-            self.axes.set_xlabel('x')
-            self.axes.set_ylabel('Concentration')
+            plt.show()
 
-            plt.savefig('diagram/task_b_run.png')
+        if self.rmse_plot == True:
             
-            
-            print("[INFO] Simulation status : Success")
-            print("[INFO] The time taken to complete the simulation is {time}".format(time=(time.process_time() - start)))
+            for n_particles in self.Np_list:
+                start  = time.process_time()
 
-        plt.show()
+                self.substance = {"sub_1": [], "sub_2": []}
+
+                self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state(n_particles)
+
+                self.run_simulation()
+
+                concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
+
+                x_grid = np.linspace(-1,1,self.Nx)
+
+                concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
+
+                observed_data = np.array(*[concentration_list])
+                reference_solution = np.array(*[self.ref_sol])
+
+                actual_concentration = observed_data[:,1]
+                predicted_concentration = np.interp(observed_data[:,0], reference_solution[:,0], reference_solution[:,1])
+
+                RMSE = mean_squared_error(predicted_concentration, actual_concentration, squared=False)
+
+                print("The RMSE value with time step {num} is {value}".format(num=n_particles, value=RMSE))
+
+                plot_test.append((n_particles, RMSE))
+
+            plt.yscale('log')
+            plt.xscale('log')
+            plt.scatter(*zip(*plot_test))
+            plt.show()
+
 
 class TaskD(TaskA):
 

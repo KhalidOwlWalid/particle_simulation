@@ -7,7 +7,7 @@ class Globals:
     def __init__(self):
 
         self.task_type = {'A':0, 'B':1, 'D':2}
-        self.task = 'A'
+        self.task = 'B'
 
         # Substance Attribute
         self.radius = 0.1
@@ -29,7 +29,7 @@ class Globals:
         # Conditions
         self.h = 0.01
         self.time = 0.0
-        self.tEnd = 0.45
+        self.tEnd = 0.2
 
         self.steps = int(self.tEnd / self.h)
         
@@ -47,5 +47,8 @@ class Globals:
         self.size = 10
 
         self.include_velocity = True
+
+        self.plot_1D = False
+        self.rmse_plot = True
 
         
