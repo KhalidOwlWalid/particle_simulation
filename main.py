@@ -1,5 +1,9 @@
-from task import TaskA, TaskB, TaskD
+# from task import TaskA, TaskB, TaskD
 from globals import Globals
+from task_a import TaskA
+from task_b import TaskB
+from task_d import TaskD
+# from task_e import TaskE
 
 if __name__ == '__main__':
 

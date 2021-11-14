@@ -7,10 +7,10 @@ class Globals:
     def __init__(self):
 
         self.task_type = {'A':0, 'B':1, 'D':2}
-        self.task = 'B'
+        self.task = 'D'
 
         # Substance Attribute
-        self.radius = 0.1
+        self.radius = 0.4
         self.offset_x = 0.4
         self.offset_y = 0.4
         
@@ -21,7 +21,7 @@ class Globals:
         self.yMin = -1
         
         # Number of particles
-        self.Np = 150000
+        self.Np = 15000
 
         # Diffusivity
         self.D = 0.1
@@ -35,7 +35,7 @@ class Globals:
         
         # Grids
 
-        self.grid_size = 100
+        self.grid_size = 50
         self.Nx = self.grid_size
         self.Ny = self.grid_size
 
