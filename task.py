@@ -10,6 +10,8 @@ from simulation_math import SimulationMath
 from initial_state import InitialState
 from concentration import Concentration
 
+from sklearn import linear_model
+
 # Add comment
 class TaskA(InitialState,SimulationMath,Concentration):
 
@@ -154,7 +156,7 @@ class TaskB(InitialState,SimulationMath,Concentration):
         self.substance_list = ["sub_1", "sub_2"]
 
         self.Ny = 1
-        self.Np_list = np.arange(1000, 200000, 1000)
+        self.Np_list = np.arange(1000, 100000, 10000)
 
     # Checks if a particle is going outside the boundary
     def boundary_conditions(self, next_pos_x):
@@ -232,7 +234,9 @@ class TaskB(InitialState,SimulationMath,Concentration):
         self.ref_sol= self.extract_data(file)
         self.figure, self.axes = plt.subplots()
 
-        plot_dict = {'marker':["-bo", "-go", "-co"], 'label':['Run 1', 'Run 2', 'Run 3'], 'color':['blue', 'green', 'cyan']}
+        plot_dict = {'marker':["-bo", "-go", "-co"], 
+                     'label':['Run 1', 'Run 2', 'Run 3'], 
+                    'color':['blue', 'green', 'cyan']}
         plot_test = []
 
         if self.plot_1D == True:
@@ -301,7 +305,14 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
             plt.yscale('log')
             plt.xscale('log')
+            plt.xlim([1e3, 1e6])
+            plt.ylim([1e-3, 1])
+            plt.title('RMSE vs Number of particles plot')
+            plt.xlabel('Number of particles')
+            plt.ylabel('RMSE')
+
             plt.scatter(*zip(*plot_test))
+
             plt.show()
 
 
