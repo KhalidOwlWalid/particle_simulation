@@ -5,6 +5,8 @@ import numpy as np
 import time
 from scipy.spatial import cKDTree
 from sklearn.metrics import mean_squared_error
+from scipy.optimize import curve_fit
+
 
 from simulation_math import SimulationMath
 from initial_state import InitialState
@@ -19,7 +21,7 @@ class TaskB(InitialState,SimulationMath,Concentration):
         self.substance_list = ["sub_1", "sub_2"]
 
         self.Ny = 1
-        self.Np_list = np.arange(1000, 10000, 1000)
+        self.Np_list = np.arange(1000, 5000, 1000)
         self.time_step_list = np.linspace(0.1, 0.001, 10)
 
     # Checks if a particle is going outside the boundary
@@ -124,11 +126,20 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
         return rmse_average_list
 
+    def rmse_plot_graph(self,axes,xlim,ylim,title,data,fitted_data):
+        axes.set_xscale('log')
+        axes.set_yscale('log')
+        axes.set_xlim(xlim)
+        axes.set_ylim(ylim)
+        axes.set_title(title)
+        axes.scatter(*zip(*data))
+        axes.plot(*zip(*fitted_data), '--')
+
+
     def main(self):
 
         file = 'data_file/reference_solution_1D.dat'
         self.ref_sol= self.extract_data(file)
-        self.figure, self.axes = plt.subplots()
 
         plot_dict = {'marker':["-bo", "-go", "-co"], 
                      'label':['Run 1', 'Run 2', 'Run 3'], 
@@ -167,7 +178,7 @@ class TaskB(InitialState,SimulationMath,Concentration):
                 print("[INFO] Simulation status : Success")
                 print("[INFO] The time taken to complete the simulation is {time}".format(time=round((time.process_time() - start), 2)))
 
-            plt.show()
+            
 
         if self.rmse_plot == True:
 
@@ -179,7 +190,6 @@ class TaskB(InitialState,SimulationMath,Concentration):
             rmse_num_particles = []
             rmse_time_step = []
 
-            # TODO: Create for different time step!
             for n_particles in self.Np_list:
 
                 start  = time.process_time()
@@ -198,36 +208,45 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
                 print("[INFO] The RMSE value with n_particles {num} is {value}".format(num=n_particles, value=round(rmse_average[1], 4)))
 
-            rmse_axes[0].set_xscale('log')
-            rmse_axes[0].set_yscale('log')
-            rmse_axes[0].set_xlim([1e2, 3e5])
-            rmse_axes[0].set_ylim([1e-3, 1])
-            rmse_axes[0].set_title('RMSE vs n_particles')
-            rmse_axes[0].scatter(*zip(*rmse_num_particles))
-            
-            for time_step in self.time_step_list:
+            fitted_rmse = self.rmse_analysis(rmse_num_particles)
+            self.rmse_plot_graph(axes=rmse_axes[0], xlim=[1e2,3e5],ylim=[1e-3,1],title='RMSE vs n_particles', data=rmse_num_particles, fitted_data=fitted_rmse)
 
-                start  = time.process_time()
+            # for time_step in self.time_step_list:
+
+            #     start  = time.process_time()
                 
-                rmse_average = []
+            #     rmse_average = []
 
-                for i in range(n_run):
+            #     for i in range(n_run):
                     
-                    rmse_average = self.calculate_rmse(rmse_average, n_particles=self.Np, time_step=time_step, calc_time_step=True)
+            #         rmse_average = self.calculate_rmse(rmse_average, n_particles=self.Np, time_step=time_step, calc_time_step=True)
 
-                rmse_average = np.array(rmse_average)
+            #     rmse_average = np.array(rmse_average)
 
-                rmse_average = np.mean(rmse_average, axis=0)
+            #     rmse_average = np.mean(rmse_average, axis=0)
 
-                rmse_time_step.append((rmse_average[0], rmse_average[1]))
+            #     rmse_time_step.append((rmse_average[0], rmse_average[1]))
 
-                print("[INFO] The RMSE value with time step {num} is {value}".format(num=round(time_step,4), value=round(rmse_average[1], 4)))
+            #     print("[INFO] The RMSE value with time step {num} is {value}".format(num=round(time_step,4), value=round(rmse_average[1], 4)))
 
-            rmse_axes[1].set_xscale('log')
-            rmse_axes[1].set_yscale('log')
-            rmse_axes[1].set_xlim([1e-4, 1])
-            rmse_axes[1].set_ylim([1e-3, 1])
-            rmse_axes[1].set_title('RMSE vs time_step')
-            rmse_axes[1].scatter(*zip(*rmse_time_step))
+            # self.rmse_plot_graph(rmse_axes[1],[1e-4,1],[1e-3,1],'RMSE vs Time Step',rmse_time_step)
 
-            plt.show()
+            # self.rmse_analysis(rmse_num_particles, rmse_time_step)
+
+        plt.show()
+
+    def rmse_analysis(self,rmse_data):
+
+        rmse_data = np.array(rmse_data)
+
+        x = rmse_data[:,0]
+        y = rmse_data[:,1]
+        popt, pcov = curve_fit(lambda fx,a,b: a*fx**-b,  x,  y)
+        power_y = popt[0]*x**-popt[1]
+        
+        return list(zip(x,power_y))
+
+
+        
+
+
