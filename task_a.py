@@ -139,7 +139,7 @@ class TaskA(InitialState,SimulationMath,Concentration):
         plt.savefig('diagram/concentration_plot.png')
 
         if self.debug:
-            print("The number of particles involved: ", (len(self.substance["sub_1"]) + len(self.substance["sub_2"])))
+            print("[DEBUG] The number of particles involved: ", (len(self.substance["sub_1"]) + len(self.substance["sub_2"])))
 
         print("[INFO] Simulation status : Success")
         print("[INFO] The time taken to complete the simulation is {time}".format(time=round((time.process_time() - start), 2)))

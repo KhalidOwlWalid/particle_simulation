@@ -196,7 +196,7 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
                 rmse_num_particles.append((rmse_average[0], rmse_average[1]))
 
-                print("The RMSE value with n_particles {num} is {value}".format(num=n_particles, value=rmse_average[1]))
+                print("[INFO] The RMSE value with n_particles {num} is {value}".format(num=n_particles, value=round(rmse_average[1], 4)))
 
             rmse_axes[0].set_xscale('log')
             rmse_axes[0].set_yscale('log')
@@ -221,7 +221,7 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
                 rmse_time_step.append((rmse_average[0], rmse_average[1]))
 
-                print("The RMSE value with time step {num} is {value}".format(num=time_step, value=rmse_average[1]))
+                print("[INFO] The RMSE value with time step {num} is {value}".format(num=round(time_step,4), value=round(rmse_average[1], 4)))
 
             rmse_axes[1].set_xscale('log')
             rmse_axes[1].set_yscale('log')

@@ -16,7 +16,7 @@ class Globals:
         OPTION : A, B, D, E
         """
         self.task_type = {'A':0, 'B':1, 'D':2}
-        self.task = 'A'
+        self.task = 'B'
         
         ####################
         # Initial position #
