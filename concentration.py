@@ -23,7 +23,8 @@ class Concentration(Globals):
         
     def calculate_concentration(self, sub_1, sub_2):
         
-        print("[INFO] Calculating concentration...")
+        print("[INFO] Calculating concentration... This may take awhile...")
+        print("[INFO] Set self.debug = True if you wish to see which grid the programme is currenly calculating")
         # Populate a "grid" with zeros
         grid_list = []
         
@@ -49,6 +50,7 @@ class Concentration(Globals):
                     for particle in sub_2:
                         if particle > self.x_grid[n] and particle < self.x_grid[n+1]:
                             n_sub_2 += 1
+
                 except IndexError:
                     print("[DEBUG] Index out of range which is the {n}th column".format(n=n))
 
@@ -100,7 +102,8 @@ class Concentration(Globals):
                     except IndexError:
                         print("[WARN] IndexError: Out of boundaries at column {col}, row {row}".format(col=(i+1), row=(j+1)))
 
-                    print("Grid {num}".format(num=(i,j)))
+                    if self.debug:
+                        print("Grid {num}".format(num=(i,j)))
 
         else:
             for i in range(self.Nx - 1):
@@ -130,10 +133,11 @@ class Concentration(Globals):
                     except IndexError:
                         print("[WARN] IndexError: Out of boundaries at column {col}, row {row}".format(col=i, row=j))
 
-                    print("Grid {num}".format(num=(i,j)))
+                    if self.debug:  
+                        print("Grid {num}".format(num=(i,j)))
 
-
-        print("[INFO] Number of empty pixels : {num}".format(num=zero_div_err))    
+        if self.debug:  
+            print("[INFO] Number of empty pixels : {num}".format(num=zero_div_err))    
                         
         return np.array(grid_list)
 

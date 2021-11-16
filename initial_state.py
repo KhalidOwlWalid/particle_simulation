@@ -10,7 +10,13 @@ class InitialState(Globals):
     def __init__(self):
         
         super().__init__()
-    
+
+        self.time = 0.0
+
+        self.steps = int(self.tEnd / self.h)
+        self.x = np.random.uniform(low=self.xMin, high=self.xMax, size=self.Np)
+        self.y = np.random.uniform(low=self.yMin, high=self.yMax, size=self.Np)
+
         self.sub_1 = []
         self.sub_2 = []
         
@@ -51,3 +57,4 @@ class InitialState(Globals):
                 self.sub_2.append(self.x[i])
 
         return np.array(self.sub_1), np.array(self.sub_2)
+

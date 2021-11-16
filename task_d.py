@@ -56,11 +56,13 @@ class TaskD(TaskA):
         concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
 
         self.concentration_plot(concentration_grid)
-        print(concentration_grid)
+        # print(concentration_grid)
         plt.savefig('diagram/concentration_plot.png')
 
-        print("The number of particles involved: ", (len(self.substance["sub_1"]) + len(self.substance["sub_2"])))
+        if self.debug:
+            print("The number of particles involved: ", (len(self.substance["sub_1"]) + len(self.substance["sub_2"])))
+
         print("[INFO] Simulation status : Success")
-        print("[INFO] The time taken to complete the simulation is {time}".format(time=(time.process_time() - start)))
+        print("[INFO] The time taken to complete the simulation is {time}".format(time=round((time.process_time() - start), 2)))
 
         plt.show()

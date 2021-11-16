@@ -49,12 +49,12 @@ class TaskA(InitialState,SimulationMath,Concentration):
         for step in range(self.steps):
             if self.include_velocity:
                 for i, sub_type in enumerate(self.substance_list):
-
+                    
                     unknown, self.index = self.spatial_field.query(np.array(self.substance[sub_type]))
                     self.interpolated_velocities = self.vector_field_data[self.index]
  
-                    self.substance[sub_type][:,0] = self.euler(self.substance[sub_type][:,0], velocity=self.interpolated_velocities[:,0], array_size=len(self.substance[sub_type][:,0]))
-                    self.substance[sub_type][:,1] = self.euler(self.substance[sub_type][:,1],  velocity=self.interpolated_velocities[:,1], array_size=len(self.substance[sub_type][:,1]))
+                    self.substance[sub_type][:,0] = self.euler(self.substance[sub_type][:,0], velocity=self.interpolated_velocities[:,0], array_size=len(self.substance[sub_type][:,0]), time_step=self.h)
+                    self.substance[sub_type][:,1] = self.euler(self.substance[sub_type][:,1],  velocity=self.interpolated_velocities[:,1], array_size=len(self.substance[sub_type][:,1]), time_step=self.h)
 
             else:
                 for i, sub_type in enumerate(self.substance_list):
@@ -62,8 +62,8 @@ class TaskA(InitialState,SimulationMath,Concentration):
                     unknown, self.index = self.spatial_field.query(np.array(self.substance[sub_type]))
                     self.interpolated_velocities = self.vector_field_data[self.index]
  
-                    self.substance[sub_type][:,0] = self.euler(self.substance[sub_type][:,0],velocity=0, array_size=len(self.substance[sub_type][:,0]))
-                    self.substance[sub_type][:,1] = self.euler(self.substance[sub_type][:,1], velocity=0, array_size=len(self.substance[sub_type][:,1]))
+                    self.substance[sub_type][:,0] = self.euler(self.substance[sub_type][:,0],velocity=0, array_size=len(self.substance[sub_type][:,0]), time_step=self.h)
+                    self.substance[sub_type][:,1] = self.euler(self.substance[sub_type][:,1], velocity=0, array_size=len(self.substance[sub_type][:,1]), time_step=self.h)
 
 
     def plot_condition(self,x,y,color,row = 0, col = 0):
@@ -84,7 +84,7 @@ class TaskA(InitialState,SimulationMath,Concentration):
             for i, sub_type in enumerate(self.substance_list):
 
                 color = None 
-                print("Plotting for ", sub_type)
+                print("[INFO] Plotting for ", sub_type)
 
                 if sub_type == "sub_1":
                     color = "red"
@@ -131,15 +131,17 @@ class TaskA(InitialState,SimulationMath,Concentration):
         self.run_simulation()
 
         # print("[INFO] Plotting the solution for time : {solution}".format(solution=self.tEnd))
-        # self.plot_solution()
+        self.plot_solution()
 
         concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
 
         self.concentration_plot(concentration_grid)
         plt.savefig('diagram/concentration_plot.png')
 
-        print("The number of particles involved: ", (len(self.substance["sub_1"]) + len(self.substance["sub_2"])))
+        if self.debug:
+            print("The number of particles involved: ", (len(self.substance["sub_1"]) + len(self.substance["sub_2"])))
+
         print("[INFO] Simulation status : Success")
-        print("[INFO] The time taken to complete the simulation is {time}".format(time=(time.process_time() - start)))
+        print("[INFO] The time taken to complete the simulation is {time}".format(time=round((time.process_time() - start), 2)))
 
         plt.show()

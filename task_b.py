@@ -19,7 +19,8 @@ class TaskB(InitialState,SimulationMath,Concentration):
         self.substance_list = ["sub_1", "sub_2"]
 
         self.Ny = 1
-        self.Np_list = np.arange(1000, 100000, 10000)
+        self.Np_list = np.arange(1000, 10000, 1000)
+        self.time_step_list = np.linspace(0.1, 0.001, 10)
 
     # Checks if a particle is going outside the boundary
     def boundary_conditions(self, next_pos_x):
@@ -35,7 +36,7 @@ class TaskB(InitialState,SimulationMath,Concentration):
         return next_pos_x
 
     # Runs the simulation 
-    def run_simulation(self):
+    def run_simulation(self, time_step):
         
         u,v = 0, 0
 
@@ -44,7 +45,8 @@ class TaskB(InitialState,SimulationMath,Concentration):
         
             for i, sub_type in enumerate(self.substance_list):
 
-                self.substance[sub_type] = self.euler(self.substance[sub_type], velocity=0, array_size=len(self.substance[sub_type]))
+                self.substance[sub_type] = self.euler(self.substance[sub_type], velocity=0, array_size=len(self.substance[sub_type]),
+                                                      time_step=time_step)
 
     # Sets all the plot condition on the graph
     def plot_condition(self,x,y,color,row = 0, col = 0):
@@ -63,7 +65,7 @@ class TaskB(InitialState,SimulationMath,Concentration):
             for i, sub_type in enumerate(self.substance_list):
                 
                 color = None 
-                print("Plotting for ", sub_type)
+                print("[INFO] Plotting for ", sub_type)
 
                 for j, coordinate in enumerate(self.substance[sub_type]):
                     
@@ -84,12 +86,43 @@ class TaskB(InitialState,SimulationMath,Concentration):
         print("[INFO] Creating concentration plot...")
         sns.heatmap(grid, cmap='RdBu')
 
-    def save_to_txt(self,array):
+    def save_to_txt(self,array, filename):
 
         for element in array: #you wouldn't need to write this since you are already in a loop
-            file1 = open("observed_data/observed_concentration_v3.txt","a") 
-            file1.write("{x_avg} {concentration}\n".format(x_avg=round(element[0], 7), concentration=element[1])) 
+            file1 = open(filename,"a") 
+            file1.write("{x} {y}\n".format(x=round(element[0], 7), y=element[1])) 
             file1.close()
+
+    def calculate_rmse(self,rmse_average_list, n_particles, time_step, calc_particles=False, calc_time_step=False):
+        
+        x_grid = np.linspace(-1,1,self.Nx)
+
+        self.substance = {"sub_1": [], "sub_2": []}
+
+        self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state(n_particles)
+
+        self.run_simulation(time_step)
+
+        concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
+
+        concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
+
+        observed_data = np.array(*[concentration_list])
+        reference_solution = np.array(*[self.ref_sol])
+
+        actual_concentration = observed_data[:,1]
+        predicted_concentration = np.interp(observed_data[:,0], reference_solution[:,0], reference_solution[:,1])
+
+        RMSE = mean_squared_error(predicted_concentration, actual_concentration, squared=False)
+
+
+        if calc_particles == True:
+            rmse_average_list.append((n_particles, RMSE))
+
+        if calc_time_step == True:
+            rmse_average_list.append((time_step, RMSE))
+
+        return rmse_average_list
 
     def main(self):
 
@@ -99,7 +132,7 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
         plot_dict = {'marker':["-bo", "-go", "-co"], 
                      'label':['Run 1', 'Run 2', 'Run 3'], 
-                    'color':['blue', 'green', 'cyan']}
+                     'color':['blue', 'green', 'cyan']}
         plot_test = []
 
         if self.plot_1D == True:
@@ -112,9 +145,8 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
                 # Here you can choose to switch between task A and task B initial state
                 self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state(self.Np)
-                #print(len(self.substance["sub_1"]))
     
-                self.run_simulation()
+                self.run_simulation(time_step=self.h)
 
                 concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
 
@@ -133,47 +165,69 @@ class TaskB(InitialState,SimulationMath,Concentration):
                 self.axes.set_ylabel('Concentration')
 
                 print("[INFO] Simulation status : Success")
-                print("[INFO] The time taken to complete the simulation is {time}".format(time=(time.process_time() - start)))
+                print("[INFO] The time taken to complete the simulation is {time}".format(time=round((time.process_time() - start), 2)))
 
             plt.show()
 
         if self.rmse_plot == True:
+
+            rmse_figure, rmse_axes= plt.subplots(1,2,figsize=(9,9))
+            rmse_figure.set_size_inches(13,13)
             
+            n_run = 10
+            
+            rmse_num_particles = []
+            rmse_time_step = []
+
+            # TODO: Create for different time step!
             for n_particles in self.Np_list:
+
                 start  = time.process_time()
+                
+                rmse_average = []
 
-                self.substance = {"sub_1": [], "sub_2": []}
+                for i in range(n_run):
+                    
+                    rmse_average = self.calculate_rmse(rmse_average, n_particles, time_step=self.h, calc_particles=True)
 
-                self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state(n_particles)
+                rmse_average = np.array(rmse_average)
 
-                self.run_simulation()
+                rmse_average = np.mean(rmse_average, axis=0)
 
-                concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
+                rmse_num_particles.append((rmse_average[0], rmse_average[1]))
 
-                x_grid = np.linspace(-1,1,self.Nx)
+                print("The RMSE value with n_particles {num} is {value}".format(num=n_particles, value=rmse_average[1]))
 
-                concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
+            rmse_axes[0].set_xscale('log')
+            rmse_axes[0].set_yscale('log')
+            rmse_axes[0].set_xlim([1e2, 3e5])
+            rmse_axes[0].set_ylim([1e-3, 1])
+            rmse_axes[0].set_title('RMSE vs n_particles')
+            rmse_axes[0].scatter(*zip(*rmse_num_particles))
+            
+            for time_step in self.time_step_list:
 
-                observed_data = np.array(*[concentration_list])
-                reference_solution = np.array(*[self.ref_sol])
+                start  = time.process_time()
+                
+                rmse_average = []
 
-                actual_concentration = observed_data[:,1]
-                predicted_concentration = np.interp(observed_data[:,0], reference_solution[:,0], reference_solution[:,1])
+                for i in range(n_run):
+                    
+                    rmse_average = self.calculate_rmse(rmse_average, n_particles=self.Np, time_step=time_step, calc_time_step=True)
 
-                RMSE = mean_squared_error(predicted_concentration, actual_concentration, squared=False)
+                rmse_average = np.array(rmse_average)
 
-                print("The RMSE value with time step {num} is {value}".format(num=n_particles, value=RMSE))
+                rmse_average = np.mean(rmse_average, axis=0)
 
-                plot_test.append((n_particles, RMSE))
+                rmse_time_step.append((rmse_average[0], rmse_average[1]))
 
-            plt.yscale('log')
-            plt.xscale('log')
-            plt.xlim([1e3, 1e6])
-            plt.ylim([1e-3, 1])
-            plt.title('RMSE vs Number of particles plot')
-            plt.xlabel('Number of particles')
-            plt.ylabel('RMSE')
+                print("The RMSE value with time step {num} is {value}".format(num=time_step, value=rmse_average[1]))
 
-            plt.scatter(*zip(*plot_test))
+            rmse_axes[1].set_xscale('log')
+            rmse_axes[1].set_yscale('log')
+            rmse_axes[1].set_xlim([1e-4, 1])
+            rmse_axes[1].set_ylim([1e-3, 1])
+            rmse_axes[1].set_title('RMSE vs time_step')
+            rmse_axes[1].scatter(*zip(*rmse_time_step))
 
             plt.show()
