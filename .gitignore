@@ -2,5 +2,5 @@ test/
 task_a
 task_b
 test_script
-observed_data
-diagram
+observed_data/
+diagram/
