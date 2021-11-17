@@ -15,7 +15,7 @@ class Globals:
         Please use capital letters!
         OPTION : A, B, D, E
         """
-        self.task_type = {'A':0, 'B':1, 'D':2, 'E': 3}
+        self.task_type = {'A':0, 'B':1, 'D':2}
         self.task = 'B'
         
         ####################
@@ -43,12 +43,12 @@ class Globals:
         Set any number of particles you want
         NOTE : Generally, it will take 10 minutes for 150000 particles
         """
-        self.Np = 150000
+        self.Np = 15000
 
         ###############
         # Diffusivity #
         ###############
-        self.D = 0.01
+        self.D = 0.1
         
         ############
         # Velocity #
@@ -66,7 +66,7 @@ class Globals:
         self.h = Time step
         self.tEnd = Time End
         """
-        self.h = 0.01
+        self.h = 0.001
         self.tEnd = 0.2
         
         #########
@@ -90,7 +90,7 @@ class Globals:
         True : Gives 1D plot of concentration vs x coordinate
         False : Does not plot 1D plot
         """
-        self.plot_1D = True
+        self.plot_1D = False
 
         """
         True : Plots the RMSE vs parameter (number of particles and different time step)
@@ -100,7 +100,7 @@ class Globals:
 
         self.lower_Np = 1000
         self.higher_Np = 160000
-
+        
         self.lower_h = 0.001
         self.higher_h = 0.1
         
@@ -110,6 +110,6 @@ class Globals:
         """"
         If you wish to see any extra information in the terminal, set self.debug to True.
         """
-        self.debug = True
+        self.debug = False
 
         
