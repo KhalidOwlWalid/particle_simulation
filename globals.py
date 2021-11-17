@@ -18,15 +18,33 @@ class Globals:
         self.task_type = {'A':0, 'B':1, 'D':2,'TEST':3}
         self.task = 'B'
         
-        ####################
-        # Initial position #
-        ####################
+        ######################################
+        # Initial position (Only for task A) #
+        ######################################
         """
         self.offset_x || self.offset_y = Position the particle anywhere inside the domain
         """
         self.radius = 0.1
         self.offset_x = 0.4
         self.offset_y = 0.4
+
+        ##############################
+        # Velocity (Only for task A) #
+        ##############################
+        """
+        True : Include the velocity inside the calculation 
+        False : No velocity
+        """
+        self.include_velocity = True
+
+        #######################
+        # Number of particles #
+        #######################
+        """
+        Set any number of particles you want
+        NOTE : Generally, it will take 10 minutes for 150000 particles
+        """
+        self.Np = 15000
         
         ##########
         # Domain #
@@ -35,30 +53,12 @@ class Globals:
         self.xMin = -1
         self.yMax = 1
         self.yMin = -1
-        
-        #######################
-        # Number of particles #
-        #######################
-        """
-        Set any number of particles you want
-        NOTE : Generally, it will take 10 minutes for 150000 particles
-        """
-        self.Np = 16000
-
+  
         ###############
         # Diffusivity #
         ###############
         self.D = 0.1
         
-        ############
-        # Velocity #
-        ############
-        """
-        True : Include the velocity inside the calculation 
-        False : No velocity
-        """
-        self.include_velocity = False
-
         ###################
         # Time conditions #
         ###################
@@ -66,7 +66,7 @@ class Globals:
         self.h = Time step
         self.tEnd = Time End
         """
-        self.h = 0.0001
+        self.h = 0.001
         self.tEnd = 0.2
         
         #########
@@ -101,7 +101,7 @@ class Globals:
         self.lower_Np = 1000
         self.higher_Np = 160000
         
-        self.lower_h = 0.001
+        self.lower_h = 0.00001
         self.higher_h = 0.1
         
         #########
@@ -110,9 +110,7 @@ class Globals:
         """"
         If you wish to see any extra information in the terminal, set self.debug to True.
         """
-        self.debug = False
+        self.debug = True
 
-
-        self.test_rmse = True
 
         

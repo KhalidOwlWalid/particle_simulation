@@ -133,10 +133,10 @@ class TaskA(InitialState,SimulationMath,Concentration):
         # print("[INFO] Plotting the solution for time : {solution}".format(solution=self.tEnd))
         self.plot_solution()
 
-        concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
+        # concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
 
-        self.concentration_plot(concentration_grid)
-        plt.savefig('diagram/concentration_plot.png')
+        # self.concentration_plot(concentration_grid)
+        # plt.savefig('diagram/concentration_plot.png')
 
         if self.debug:
             print("[DEBUG] The number of particles involved: ", (len(self.substance["sub_1"]) + len(self.substance["sub_2"])))

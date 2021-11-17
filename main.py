@@ -22,3 +22,7 @@ if __name__ == '__main__':
 
     if globals.task_type[globals.task] == 2:
         task_D.main_task_D()
+
+    if globals.task_type[globals.task] == 3:
+        taskTest.main()
+        

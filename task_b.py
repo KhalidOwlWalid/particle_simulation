@@ -158,6 +158,48 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
         if self.plot_1D == True:
 
+            # time_step_list = [0.1,0.01,0.001]
+
+            # for i, time_step in enumerate(time_step_list):
+
+            #     start  = time.process_time()
+
+            #     self.substance = {"sub_1": [], "sub_2": []}
+
+            #     # Here you can choose to switch between task A and task B initial state
+            #     self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state(self.Np)
+    
+            #     self.run_simulation(time_step=time_step)
+
+            #     concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
+
+            #     x_grid = np.linspace(-1,1,self.Nx)
+
+            #     concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
+
+            #     if i == 0:
+            #         self.axes.plot(*zip(*self.ref_sol), color="red", label='Reference Solution')
+            #         self.axes.plot(*zip(*concentration_list),plot_dict['marker'][i], color=plot_dict['color'][i], markersize=3, label=str(time_step))
+            #         self.axes.legend()
+
+
+            #     if i == 1:
+            #         self.axes.plot(*zip(*concentration_list),plot_dict['marker'][i], color=plot_dict['color'][i], markersize=3, label=str(time_step))
+            #         self.axes.legend()
+
+            #     if i==2:
+            #         self.axes.plot(*zip(*concentration_list),plot_dict['marker'][i], color=plot_dict['color'][i], markersize=3, label=str(time_step))
+            #         self.axes.legend()
+
+            #     self.axes.set_title('1D Diffusion Problem')
+            #     self.axes.set_xlabel('x')
+            #     self.axes.set_ylabel('Concentration')
+
+            #     print("[INFO] Simulation status : Success")
+            #     print("[INFO] The time taken to complete the simulation is {time}".format(time=round((time.process_time() - start), 2)))
+
+            # plt.show()
+
             for i, run in enumerate(plot_dict['label']):
 
                 start  = time.process_time()
@@ -201,41 +243,31 @@ class TaskB(InitialState,SimulationMath,Concentration):
             rmse_time_step = []
 
             # TODO: Create for different time step!
-            for n_particles in self.Np_list:
+            # for n_particles in self.Np_list:
 
-                start  = time.process_time()
+            #     start  = time.process_time()
                 
-                rmse_average = []
+            #     rmse_average = []
 
-                for i in range(n_run):
+            #     for i in range(n_run):
                     
-                    rmse_average = self.calculate_rmse(rmse_average, n_particles, time_step=self.h, calc_particles=True)
+            #         rmse_average = self.calculate_rmse(rmse_average, n_particles, time_step=self.h, calc_particles=True)
 
-                rmse_average = np.array(rmse_average)
+            #     rmse_average = np.array(rmse_average)
 
-                rmse_average = np.mean(rmse_average, axis=0)
+            #     rmse_average = np.mean(rmse_average, axis=0)
 
-                rmse_num_particles.append((rmse_average[0], rmse_average[1]))
+            #     rmse_num_particles.append((rmse_average[0], rmse_average[1]))
 
-                print("[INFO] The RMSE value with n_particles {num} is {value}".format(num=n_particles, value=round(rmse_average[1], 4)))
+            #     print("[INFO] The RMSE value with n_particles {num} is {value} for time step {h}".format(num=n_particles, value=round(rmse_average[1], 4),h=self.h))
 
-            title = 'RMSE against Number of particles for h={num}'.format(num=self.h)
-
-            rmse_nparticles_analysis = self.rmse_analysis(rmse_num_particles,diff_particles=True)
-
-            self.plot_rmse_analysis(axes=rmse_axes[0],xlim=[self.lower_Np - 100,self.higher_Np + 100], xlabel='Number of particles', ylabel='RMSE',title=title,
-                                    observed_data=rmse_num_particles, fitted_data=rmse_nparticles_analysis, diff_nparticles=True)
-
-            # rmse_axes[0].set_xscale('log')
-            # rmse_axes[0].set_yscale('log')
-            # rmse_axes[0].set_xlim([self.lower_Np - 100, self.higher_Np + 100])
-            # # rmse_axes[0].set_ylim([0.01, 0.1])
-            # rmse_axes[0].set_xlabel('Number of particles')
-            # rmse_axes[1].set_ylabel('RMSE')
             # title = 'RMSE against Number of particles for h={num}'.format(num=self.h)
-            # rmse_axes[0].set_title('RMSE vs n_particles')
-            # rmse_axes[0].scatter(*zip(*rmse_num_particles))
-            # rmse_axes[0].plot(*zip(*rmse_nparticles_analysis), color='red', linestyle='dashed')
+
+            # rmse_nparticles_analysis = self.rmse_analysis(rmse_num_particles,diff_particles=True)
+
+            # self.plot_rmse_analysis(axes=rmse_axes[0],xlim=[self.lower_Np - 100,self.higher_Np + 100], xlabel='Number of particles', ylabel='RMSE',title=title,
+            #                         observed_data=rmse_num_particles, fitted_data=rmse_nparticles_analysis, diff_nparticles=True)
+
             
             for time_step in self.time_step_list:
 
@@ -259,14 +291,8 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
             rmse_time_step_analysis = self.rmse_analysis(rmse_time_step,diff_time_step=True)
 
-            self.plot_rmse_analysis(axes=rmse_axes[1],xlim=[1e-4,1],ylim=[2e-3, 0.5],title=title,xlabel='Time Step (s)',ylabel='RMSE',
+            self.plot_rmse_analysis(axes=rmse_axes[1],xlim=[self.lower_h - (self.lower_h/2), self.higher_h + self.higher_h/2],ylim=[2e-3, 0.5],title=title,xlabel='Time Step (s)',ylabel='RMSE',
                                     observed_data=rmse_time_step, fitted_data=rmse_time_step_analysis, diff_timestep=True)
-            # rmse_axes[1].set_xscale('log')
-            # rmse_axes[1].set_xlim([1e-4, 1])
-            # rmse_axes[1].set_ylim([2e-3, 0.5])
-            # rmse_axes[1].set_title('RMSE vs time_step')
-            # rmse_axes[1].scatter(*zip(*rmse_time_step))
-            # rmse_axes[1].plot(*zip(*test), color='red', linestyle='dashed')
 
             plt.show()
 
