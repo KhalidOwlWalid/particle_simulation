@@ -97,6 +97,12 @@ class Globals:
         False : No plot
         """
         self.rmse_plot = True
+
+        self.lower_Np = 1000
+        self.higher_Np = 160000
+        
+        self.lower_h = 0.001
+        self.higher_h = 0.1
         
         #########
         # Debug #
