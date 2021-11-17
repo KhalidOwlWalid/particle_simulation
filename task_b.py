@@ -21,8 +21,6 @@ class TaskB(InitialState,SimulationMath,Concentration):
         self.substance_list = ["sub_1", "sub_2"]
 
         self.Ny = 1
-        self.Np_list = np.arange(1000, 5000, 1000)
-        self.time_step_list = np.linspace(0.1, 0.001, 10)
 
     # Checks if a particle is going outside the boundary
     def boundary_conditions(self, next_pos_x):
@@ -110,6 +108,7 @@ class TaskB(InitialState,SimulationMath,Concentration):
         concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
 
         observed_data = np.array(*[concentration_list])
+
         reference_solution = np.array(*[self.ref_sol])
 
         actual_concentration = observed_data[:,1]
@@ -126,15 +125,16 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
         return rmse_average_list
 
-    def rmse_plot_graph(self,axes,xlim,ylim,title,data,fitted_data):
+    def rmse_plot_graph(self,axes,xlabel,xlim,title,data,fitted_data):
         axes.set_xscale('log')
         axes.set_yscale('log')
         axes.set_xlim(xlim)
-        axes.set_ylim(ylim)
+        axes.set_ylim([1e-3,1])
+        axes.set_xlabel(xlabel)
+        axes.set_ylabel('RMSE')
         axes.set_title(title)
         axes.scatter(*zip(*data))
-        axes.plot(*zip(*fitted_data), '--')
-
+        axes.plot(*zip(*fitted_data), color='red', linestyle='dashed')
 
     def main(self):
 
@@ -147,6 +147,8 @@ class TaskB(InitialState,SimulationMath,Concentration):
         plot_test = []
 
         if self.plot_1D == True:
+            
+            self.figure, self.axes = plt.subplots()
 
             for i, run in enumerate(plot_dict['label']):
 
@@ -185,13 +187,13 @@ class TaskB(InitialState,SimulationMath,Concentration):
             rmse_figure, rmse_axes= plt.subplots(1,2,figsize=(9,9))
             rmse_figure.set_size_inches(13,13)
             
-            n_run = 10
+            n_run = 1
             
             rmse_num_particles = []
             rmse_time_step = []
 
             for n_particles in self.Np_list:
-
+                
                 start  = time.process_time()
                 
                 rmse_average = []
@@ -206,44 +208,57 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
                 rmse_num_particles.append((rmse_average[0], rmse_average[1]))
 
-                print("[INFO] The RMSE value with n_particles {num} is {value}".format(num=n_particles, value=round(rmse_average[1], 4)))
+                print("[INFO] The RMSE value with {num} particles is {value}".format(num=n_particles, value=round(rmse_average[1], 4)))
 
-            fitted_rmse = self.rmse_analysis(rmse_num_particles)
-            self.rmse_plot_graph(axes=rmse_axes[0], xlim=[1e2,3e5],ylim=[1e-3,1],title='RMSE vs n_particles', data=rmse_num_particles, fitted_data=fitted_rmse)
+            fitted_rmse = self.rmse_analysis(rmse_data=rmse_num_particles, diff_particles=True)
 
-            # for time_step in self.time_step_list:
+            title = 'RMSE vs Number of particles for h={time_step}'.format(time_step=self.h)
 
-            #     start  = time.process_time()
+            self.rmse_plot_graph(axes=rmse_axes[0], xlabel='Number of particles', xlim=[1e2,3e5],title=title, 
+                                 data=rmse_num_particles, fitted_data=fitted_rmse)
+
+            for time_step in self.time_step_list:
+
+                start  = time.process_time()
                 
-            #     rmse_average = []
+                rmse_average = []
 
-            #     for i in range(n_run):
+                for i in range(n_run):
                     
-            #         rmse_average = self.calculate_rmse(rmse_average, n_particles=self.Np, time_step=time_step, calc_time_step=True)
+                    rmse_average = self.calculate_rmse(rmse_average, n_particles=self.Np, time_step=time_step, calc_time_step=True)
 
-            #     rmse_average = np.array(rmse_average)
+                rmse_average = np.array(rmse_average)
 
-            #     rmse_average = np.mean(rmse_average, axis=0)
+                rmse_average = np.mean(rmse_average, axis=0)
 
-            #     rmse_time_step.append((rmse_average[0], rmse_average[1]))
+                rmse_time_step.append((rmse_average[0], rmse_average[1]))
 
-            #     print("[INFO] The RMSE value with time step {num} is {value}".format(num=round(time_step,4), value=round(rmse_average[1], 4)))
+                print("[INFO] The RMSE value with time step {num} is {value}".format(num=round(time_step,4), value=round(rmse_average[1], 4)))
 
-            # self.rmse_plot_graph(rmse_axes[1],[1e-4,1],[1e-3,1],'RMSE vs Time Step',rmse_time_step)
+            fitted_rmse = self.rmse_analysis(rmse_data=rmse_time_step, diff_time_step=True)
 
-            # self.rmse_analysis(rmse_num_particles, rmse_time_step)
+            title = 'RMSE vs Time Step for {num} particles'.format(num=self.Np)
+            self.rmse_plot_graph(axes=rmse_axes[1],xlabel='Time Step',xlim=[1e-4,1],title=title,
+                                 data=rmse_time_step,fitted_data=fitted_rmse)
 
         plt.show()
 
-    def rmse_analysis(self,rmse_data):
+    def rmse_analysis(self,rmse_data,diff_particles=False,diff_time_step=False):
 
         rmse_data = np.array(rmse_data)
 
-        x = rmse_data[:,0]
-        y = rmse_data[:,1]
-        popt, pcov = curve_fit(lambda fx,a,b: a*fx**-b,  x,  y)
-        power_y = popt[0]*x**-popt[1]
-        
+        if diff_particles:
+            x = rmse_data[:,0]
+            y = rmse_data[:,1]
+            popt, pcov = curve_fit(lambda fx,a,b: a*fx**-b,  x,  y)
+            power_y = popt[0]*x**-popt[1]
+
+        if diff_time_step:
+            x = rmse_data[:,0]
+            y = rmse_data[:,1]
+            popt, pcov = curve_fit(lambda fx,a,b: a * np.log(fx) + b,  x,  y)
+            power_y = popt[0] * np.log(x) + popt[1]
+
         return list(zip(x,power_y))
 
 

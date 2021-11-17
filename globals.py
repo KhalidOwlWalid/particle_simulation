@@ -4,6 +4,9 @@
 
 import numpy as np
 
+
+# from task_e import TaskE
+
 class Globals:
 
     def __init__(self):
@@ -43,7 +46,7 @@ class Globals:
         Set any number of particles you want
         NOTE : Generally, it will take 10 minutes for 150000 particles
         """
-        self.Np = 15000
+        self.Np = 16000
 
         ###############
         # Diffusivity #
@@ -66,7 +69,7 @@ class Globals:
         self.h = Time step
         self.tEnd = Time End
         """
-        self.h = 0.001
+        self.h = 0.01
         self.tEnd = 0.2
         
         #########
@@ -97,6 +100,9 @@ class Globals:
         False : No plot
         """
         self.rmse_plot = True
+
+        self.Np_list = np.arange(1000, 100000, 10000)
+        self.time_step_list = np.linspace(0.0001, 0.1, 10)
         
         #########
         # Debug #
