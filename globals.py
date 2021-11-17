@@ -15,7 +15,7 @@ class Globals:
         Please use capital letters!
         OPTION : A, B, D, E
         """
-        self.task_type = {'A':0, 'B':1, 'D':2}
+        self.task_type = {'A':0, 'B':1, 'D':2,'TEST':3}
         self.task = 'B'
         
         ####################
@@ -43,7 +43,7 @@ class Globals:
         Set any number of particles you want
         NOTE : Generally, it will take 10 minutes for 150000 particles
         """
-        self.Np = 15000
+        self.Np = 16000
 
         ###############
         # Diffusivity #
@@ -66,7 +66,7 @@ class Globals:
         self.h = Time step
         self.tEnd = Time End
         """
-        self.h = 0.001
+        self.h = 0.0001
         self.tEnd = 0.2
         
         #########
@@ -111,5 +111,8 @@ class Globals:
         If you wish to see any extra information in the terminal, set self.debug to True.
         """
         self.debug = False
+
+
+        self.test_rmse = True
 
         
