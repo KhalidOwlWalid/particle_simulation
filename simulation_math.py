@@ -41,6 +41,6 @@ class SimulationMath(Globals):
         
         # This causes the grid to be moved to 
         random = self.generate_random_number(array_size)
-
+        print(time_step)
         return coordinate + velocity * time_step + np.sqrt(2 * self.D) * np.sqrt(time_step) * random
 

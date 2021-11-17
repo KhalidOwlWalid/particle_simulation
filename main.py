@@ -11,6 +11,7 @@ if __name__ == '__main__':
     task_A = TaskA()
     task_B = TaskB()
     task_D = TaskD()
+    # task_E = TaskE()
 
     if globals.task_type[globals.task] == 0:
         task_A.main()
@@ -21,3 +22,5 @@ if __name__ == '__main__':
     if globals.task_type[globals.task] == 2:
         task_D.main_task_D()
         
+    # if globals.task_type[globals.task] == 3:
+    #     task_E.main()

@@ -129,7 +129,7 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
         return rmse_average_list
 
-    def plot_rmse_analysis(self,axes,xlim,title,xlabel,ylabel,observed_data,fitted_data,
+    def plot_rmse_analysis(self,axes,xlim,title,xlabel,ylabel,observed_data,fitted_data,label,
                             ylim=None,diff_nparticles=False,diff_timestep=False):
 
         axes.set_xscale('log')
@@ -137,11 +137,14 @@ class TaskB(InitialState,SimulationMath,Concentration):
         axes.set_xlabel(xlabel)
         axes.set_ylabel(ylabel)
         axes.set_title(title)
-        axes.scatter(*zip(*observed_data))
-        axes.plot(*zip(*fitted_data), color='red',linestyle='dashed')
+        observed_data_plot = axes.scatter(*zip(*observed_data))
+        fitted_data_plot, = axes.plot(*zip(*fitted_data), color='red',linestyle='dashed')
+        fitted_data_plot.set_label(label)
+        axes.legend()
 
         if diff_nparticles:
             axes.set_yscale('log')
+            axes.legend
         if diff_timestep:
             axes.set_ylim(ylim)
 
@@ -221,21 +224,13 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
             title = 'RMSE against Number of particles for h={num}'.format(num=self.h)
 
-            rmse_nparticles_analysis = self.rmse_analysis(rmse_num_particles,diff_particles=True)
+            coefficient, rmse_nparticles_analysis = self.rmse_analysis(rmse_num_particles,diff_particles=True)
 
-            self.plot_rmse_analysis(axes=rmse_axes[0],xlim=[self.lower_Np - 100,self.higher_Np + 100], xlabel='Number of particles', ylabel='RMSE',title=title,
+            fitted_eqn_particles = '{a}*Np^({b})'.format(a=round(coefficient[0],3), b=round(-coefficient[1],3))
+
+            self.plot_rmse_analysis(axes=rmse_axes[0],xlim=[self.lower_Np - 100,self.higher_Np + 100], xlabel='Number of particles', ylabel='RMSE',title=title,label=fitted_eqn_particles,
                                     observed_data=rmse_num_particles, fitted_data=rmse_nparticles_analysis, diff_nparticles=True)
 
-            # rmse_axes[0].set_xscale('log')
-            # rmse_axes[0].set_yscale('log')
-            # rmse_axes[0].set_xlim([self.lower_Np - 100, self.higher_Np + 100])
-            # # rmse_axes[0].set_ylim([0.01, 0.1])
-            # rmse_axes[0].set_xlabel('Number of particles')
-            # rmse_axes[1].set_ylabel('RMSE')
-            # title = 'RMSE against Number of particles for h={num}'.format(num=self.h)
-            # rmse_axes[0].set_title('RMSE vs n_particles')
-            # rmse_axes[0].scatter(*zip(*rmse_num_particles))
-            # rmse_axes[0].plot(*zip(*rmse_nparticles_analysis), color='red', linestyle='dashed')
             
             for time_step in self.time_step_list:
 
@@ -257,16 +252,12 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
             title = 'RMSE against Time Step for N particles ={num}'.format(num=self.Np)
 
-            rmse_time_step_analysis = self.rmse_analysis(rmse_time_step,diff_time_step=True)
+            coefficient, rmse_time_step_analysis = self.rmse_analysis(rmse_time_step,diff_time_step=True)
 
-            self.plot_rmse_analysis(axes=rmse_axes[1],xlim=[1e-4,1],ylim=[2e-3, 0.5],title=title,xlabel='Time Step (s)',ylabel='RMSE',
+            fitted_time_equation = '{a} * ln(h) + {b}'.format(a=round(coefficient[0],3), b=round(coefficient[1],3))
+
+            self.plot_rmse_analysis(axes=rmse_axes[1],xlim=[1e-4,1],ylim=[2e-3, 0.5],title=title,xlabel='Time Step (s)',ylabel='RMSE',label=fitted_time_equation,
                                     observed_data=rmse_time_step, fitted_data=rmse_time_step_analysis, diff_timestep=True)
-            # rmse_axes[1].set_xscale('log')
-            # rmse_axes[1].set_xlim([1e-4, 1])
-            # rmse_axes[1].set_ylim([2e-3, 0.5])
-            # rmse_axes[1].set_title('RMSE vs time_step')
-            # rmse_axes[1].scatter(*zip(*rmse_time_step))
-            # rmse_axes[1].plot(*zip(*test), color='red', linestyle='dashed')
 
             plt.show()
 
@@ -286,4 +277,4 @@ class TaskB(InitialState,SimulationMath,Concentration):
             popt, pcov = curve_fit(lambda fx,a,b: a * np.log(fx) + b,  x,  y)
             power_y = popt[0] * np.log(x) + popt[1]
 
-        return list(zip(x,power_y))
+        return popt, list(zip(x,power_y))
