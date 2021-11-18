@@ -54,7 +54,6 @@ class TaskD(TaskA):
 
         self.concentration_plot(concentration_grid)
         # print(concentration_grid)
-        plt.savefig('diagram/concentration_plot.png')
 
         if self.debug:
             print("[DEBUG] The number of particles involved: ", (len(self.substance["sub_1"]) + len(self.substance["sub_2"])))

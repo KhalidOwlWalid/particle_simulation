@@ -13,7 +13,7 @@ class InitialState(Globals):
 
         self.time = 0.0
 
-        self.steps = int(self.tEnd / self.h)
+        
         self.x = np.random.uniform(low=self.xMin, high=self.xMax, size=self.Np)
         self.y = np.random.uniform(low=self.yMin, high=self.yMax, size=self.Np)
 

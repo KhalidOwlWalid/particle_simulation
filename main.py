@@ -12,12 +12,12 @@ if __name__ == '__main__':
     task_B = TaskB()
     task_D = TaskD()
 
-    if globals.task_type[globals.task] == 0:
+    if globals.getTask() == 0:
         task_A.main()
 
-    if globals.task_type[globals.task] == 1:
+    if globals.getTask() == 1:
         task_B.main()
 
-    if globals.task_type[globals.task] == 2:
+    if globals.getTask() == 2:
         task_D.main_task_D()
         

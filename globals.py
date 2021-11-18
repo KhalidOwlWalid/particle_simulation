@@ -6,6 +6,7 @@ import numpy as np
 
 class Globals:
 
+
     def __init__(self):
 
         ########
@@ -17,6 +18,8 @@ class Globals:
         """
         self.task_type = {'A':0, 'B':1, 'D':2}
         self.task = 'B'
+        
+        
         
         ####################
         # Initial position #
@@ -43,7 +46,7 @@ class Globals:
         Set any number of particles you want
         NOTE : Generally, it will take 10 minutes for 150000 particles
         """
-        self.Np = 15000
+        self.Np = 32000
 
         ###############
         # Diffusivity #
@@ -57,7 +60,7 @@ class Globals:
         True : Include the velocity inside the calculation 
         False : No velocity
         """
-        self.include_velocity = False
+        self.include_velocity = True
 
         ###################
         # Time conditions #
@@ -66,7 +69,7 @@ class Globals:
         self.h = Time step
         self.tEnd = Time End
         """
-        self.h = 0.001
+        self.h = 0.01
         self.tEnd = 0.2
         
         #########
@@ -76,7 +79,7 @@ class Globals:
         Choose your desired grid size
         NOTE : For Task B, self.Ny is set to 1 by default
         """
-        self.grid_size = 64
+        self.grid_size = 100
         self.Nx = self.grid_size
         self.Ny = self.grid_size
 
@@ -90,19 +93,19 @@ class Globals:
         True : Gives 1D plot of concentration vs x coordinate
         False : Does not plot 1D plot
         """
-        self.plot_1D = False
+        self.plot_1D = True
 
         """
         True : Plots the RMSE vs parameter (number of particles and different time step)
         False : No plot
         """
-        self.rmse_plot = True
+        self.rmse_plot = False
 
         self.lower_Np = 1000
         self.higher_Np = 160000
         
         self.lower_h = 0.001
-        self.higher_h = 0.1
+        self.higher_h = 0.05
         
         #########
         # Debug #
@@ -110,6 +113,7 @@ class Globals:
         """"
         If you wish to see any extra information in the terminal, set self.debug to True.
         """
-        self.debug = False
+        self.debug = True
 
-        
+    def getTask(self):
+        return self.task_type[self.task]  

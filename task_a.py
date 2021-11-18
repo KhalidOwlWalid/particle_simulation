@@ -45,6 +45,8 @@ class TaskA(InitialState,SimulationMath,Concentration):
         return next_pos_x, next_pos_y
 
     def run_simulation(self):
+        
+        self.steps = int(self.tEnd / self.h)
 
         for step in range(self.steps):
             if self.include_velocity:
@@ -132,11 +134,10 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
         # print("[INFO] Plotting the solution for time : {solution}".format(solution=self.tEnd))
         self.plot_solution()
-
+        
         concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
 
         self.concentration_plot(concentration_grid)
-        plt.savefig('diagram/concentration_plot.png')
 
         if self.debug:
             print("[DEBUG] The number of particles involved: ", (len(self.substance["sub_1"]) + len(self.substance["sub_2"])))

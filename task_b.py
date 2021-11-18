@@ -42,8 +42,8 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
     # Runs the simulation 
     def run_simulation(self, time_step):
-        
-        u,v = 0, 0
+
+        self.steps = int(self.tEnd / self.h)
 
         # Run the simulation until time ends
         for step in range(self.steps):
@@ -158,7 +158,8 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
         if self.plot_1D == True:
 
-            for i, run in enumerate(plot_dict['label']):
+            # for i, run in enumerate(plot_dict['label']):
+            for i in range(1):
 
                 start  = time.process_time()
 
@@ -178,7 +179,7 @@ class TaskB(InitialState,SimulationMath,Concentration):
                 if i == 0:
                     self.axes.plot(*zip(*self.ref_sol), color="red", label='Reference Solution')
                 
-                self.axes.plot(*zip(*concentration_list),plot_dict['marker'][i], color=plot_dict['color'][i], markersize=3, label=run)
+                self.axes.plot(*zip(*concentration_list),plot_dict['marker'][i], color=plot_dict['color'][i], markersize=3, label='Run 1')
                 self.axes.legend()
 
                 self.axes.set_title('1D Diffusion Problem')
