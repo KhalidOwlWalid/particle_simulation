@@ -17,7 +17,7 @@ class Globals:
         OPTION : A, B, D, E
         """
         self.task_type = {'A':0, 'B':1, 'D':2}
-        self.task = 'D'
+        self.task = 'A'
         
         ####################
         # Initial position #
@@ -73,8 +73,8 @@ class Globals:
         """
         INFO : For h = 0.001 with 100 grids and 150000 particles, it takes 600 seconds to plot
         """
-        self.h = 0.001
-        self.tEnd = 0.4
+        self.h = 0.01
+        self.tEnd = 0.01
         
         #########
         # Grids #
