@@ -24,6 +24,8 @@ class TaskB(InitialState,SimulationMath,Concentration):
         self.Np_list = np.arange(1000,200000,10000)
         self.time_step_list = np.linspace(0.1,0.0001,30)
 
+        self.tEnd = 0.2
+
     # Checks if a particle is going outside the boundary
     def boundary_conditions(self, next_pos_x):
 

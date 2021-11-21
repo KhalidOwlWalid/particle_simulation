@@ -19,8 +19,6 @@ class Globals:
         self.task_type = {'A':0, 'B':1, 'D':2}
         self.task = 'D'
         
-        
-        
         ####################
         # Initial position #
         ####################
@@ -68,13 +66,15 @@ class Globals:
         """
         self.h = Time step
         self.tEnd = Time End
+
+        By default, task B's tEnd is set to t=0.2
         """
 
         """
-        INFO : For h = 0.001, it takes 600 seconds to plot
+        INFO : For h = 0.001 with 100 grids and 150000 particles, it takes 600 seconds to plot
         """
         self.h = 0.001
-        self.tEnd = 0.15
+        self.tEnd = 0.4
         
         #########
         # Grids #
@@ -97,13 +97,13 @@ class Globals:
         True : Gives 1D plot of concentration vs x coordinate
         False : Does not plot 1D plot
         """
-        self.plot_1D = False
+        self.plot_1D = True
 
         """
         True : Plots the RMSE vs parameter (number of particles and different time step)
         False : No plot
         """
-        self.rmse_plot = True
+        self.rmse_plot = False
         
         #########
         # Debug #
