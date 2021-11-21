@@ -4,3 +4,7 @@ task_b
 test_script
 observed_data/
 diagram/
+
+__pycache__/
+*.py[cod]
+*$py.class
