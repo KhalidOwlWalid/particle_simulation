@@ -74,35 +74,26 @@ class Concentration(Globals):
             for i in range(len(self.x_grid)- 1):
                 for j in range(len(self.y_grid) - 1):
 
-                    n_sub_2 = 0
+                    check_inside_grid_x1 = np.logical_and(sub_1[:,0] > self.x_grid[i], sub_1[:,0] < self.x_grid[i+1])
+                    check_inside_grid_y1 = np.logical_and(sub_1[:,1] < self.y_grid[j], sub_1[:,1] > self.y_grid[j+1])
+                    grid_sub1_count = np.where(np.logical_and(check_inside_grid_x1, check_inside_grid_y1), 1, 0)
+                    unique, particle_count1 = np.unique(grid_sub1_count, return_counts=True)
 
-                    for particle in sub_1:
-                        # Check corner
-                        if grid_position(particle[0], particle[1], i, j):
-                            grid_list[j][i] += 1
-                            
-                    for particle in sub_2:
-                        
-                        # Check corner
-                        if grid_position(particle[0], particle[1], i, j):
-                            n_sub_2 += 1
-                    try:
-                        grid_concentration = grid_list[j][i]/(grid_list[j][i] + n_sub_2)
+                    check_inside_grid_x2 = np.logical_and(sub_2[:,0] > self.x_grid[i], sub_2[:,0] < self.x_grid[i+1])
+                    check_inside_grid_y2 = np.logical_and(sub_2[:,1] < self.y_grid[j], sub_2[:,1] > self.y_grid[j+1])
+                    grid_sub2_count = np.where(np.logical_and(check_inside_grid_x2, check_inside_grid_y2), 1, 0)
+                    unique, particle_count2 = np.unique(grid_sub2_count, return_counts=True)
+                    
+                    if len(particle_count1) == 2:
+                        try:
+                            concentration = particle_count1[1]/(particle_count1[1] + particle_count2[1])
 
-                        if grid_concentration > 0.3:
-                            grid_list[j][i] = grid_concentration
-
-                        elif grid_concentration < 0.3:
-                            grid_list[j][i] = 0
-
-                    # There will be grids where it is empty
-                    except ZeroDivisionError:
-                        zero_div_err += 1
-                        #print("[WARN] ZeroDivisionError : Not enough particles to calculate")
-
-                    # At one point , our calculation might go out of boundary
-                    except IndexError:
-                        print("[WARN] IndexError: Out of boundaries at column {col}, row {row}".format(col=(i+1), row=(j+1)))
+                            if concentration > 0.3:
+                                grid_list[j][i] = concentration
+                            else:
+                                grid_list[j][i] = 0
+                        except:
+                            pass
 
                     if self.debug:
                         print("[DEBUG] Grid {num}".format(num=(i,j)))
