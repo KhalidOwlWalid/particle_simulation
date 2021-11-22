@@ -1,3 +1,7 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
 test/
 task_a
 task_b
@@ -5,6 +9,3 @@ test_script
 observed_data/
 diagram/
 
-__pycache__/
-*.py[cod]
-*$py.class
