@@ -123,9 +123,6 @@ class Concentration(Globals):
 
                 if self.debug:
                         print("[DEBUG] Grid {num}".format(num=(i,j)))
-
-        if self.debug:  
-            print("[DEBUG] Number of empty pixels : {num}".format(num=zero_div_err))    
                         
         return np.array(grid_list)
 

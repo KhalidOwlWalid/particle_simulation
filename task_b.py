@@ -4,15 +4,10 @@ import matplotlib.colors
 import numpy as np
 import time
 from scipy.spatial import cKDTree
-from sklearn.metrics import mean_squared_error
 
 from simulation_math import SimulationMath
-from initial_state import InitialState
-from concentration import Concentration
 
-from scipy.optimize import curve_fit
-
-class TaskB(InitialState,SimulationMath,Concentration):
+class TaskB(SimulationMath):
 
     def __init__(self):
         super().__init__()
@@ -22,7 +17,7 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
         self.Ny = 1
         self.Np_list = np.arange(1000,200000,10000)
-        self.time_step_list = np.linspace(0.1,0.0001,30)
+        self.time_step_list = np.linspace(0.1,0.0001,20)
 
         self.tEnd = 0.2
 
@@ -97,36 +92,6 @@ class TaskB(InitialState,SimulationMath,Concentration):
             file1.write("{x} {y}\n".format(x=round(element[0], 7), y=element[1])) 
             file1.close()
 
-    def calculate_rmse(self,rmse_average_list, n_particles, time_step, calc_particles=False, calc_time_step=False):
-        
-        x_grid = np.linspace(-1,1,self.Nx)
-
-        self.substance = {"sub_1": [], "sub_2": []}
-
-        self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state(n_particles)
-
-        self.run_simulation(time_step)
-
-        concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
-
-        concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
-
-        observed_data = np.array(*[concentration_list])
-        reference_solution = np.array(*[self.ref_sol])
-
-        actual_concentration = observed_data[:,1]
-        predicted_concentration = np.interp(observed_data[:,0], reference_solution[:,0], reference_solution[:,1])
-
-        if calc_particles:
-            RMSE = mean_squared_error(predicted_concentration, actual_concentration, squared=False)
-            rmse_average_list.append((n_particles, RMSE))
-        if calc_time_step:
-            RMSE = mean_squared_error(predicted_concentration, actual_concentration, squared=False)
-            rmse_average_list.append((time_step, RMSE))
-            
-
-        return rmse_average_list
-
     def plot_rmse_analysis(self,axes,xlim,title,xlabel,ylabel,observed_data,fitted_data,label,
                             ylim=None,diff_nparticles=False,diff_timestep=False):
 
@@ -140,7 +105,6 @@ class TaskB(InitialState,SimulationMath,Concentration):
         axes.plot(*zip(*fitted_data), color='red',linestyle='dashed', label=label)
         axes.legend()
         
-
         if diff_nparticles:
             pass
         if diff_timestep:
@@ -148,9 +112,9 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
     def main(self):
 
-        file = 'data_file/reference_solution_1D.dat'
+        file = 'reference_solution_1D.dat'
         self.ref_sol= self.extract_data(file)
-        self.figure, self.axes = plt.subplots()
+        
 
         plot_dict = {'marker':["-bo", "-go", "-co"], 
                      'label':['Run 1', 'Run 2', 'Run 3'], 
@@ -158,6 +122,8 @@ class TaskB(InitialState,SimulationMath,Concentration):
         plot_test = []
 
         if self.plot_1D == True:
+
+            self.figure, self.axes = plt.subplots()
 
             for i, run in enumerate(plot_dict['label']):
 
@@ -186,10 +152,8 @@ class TaskB(InitialState,SimulationMath,Concentration):
                 self.axes.set_xlabel('x')
                 self.axes.set_ylabel('Concentration')
 
-                print("[INFO] Simulation status : Success")
-                print("[INFO] The time taken to complete the simulation is {time}".format(time=round((time.process_time() - start), 2)))
-
-            plt.show()
+                print("[INFO] Run {num} Simulation status : Success".format(num=(i+1)))
+                print("[INFO] The time taken to complete the simulation for Run {num} is {time}".format(num=(i+1),time=round((time.process_time() - start), 2)))
 
         if self.rmse_plot == True:
 
@@ -201,14 +165,12 @@ class TaskB(InitialState,SimulationMath,Concentration):
             rmse_num_particles = []
             rmse_time_step = []
 
-            # TODO: Create for different time step!
             for n_particles in self.Np_list:
 
                 start  = time.process_time()
                 
                 rmse_average = []
 
-                print(n_particles)
                 for i in range(n_run):
                     
                     rmse_average = self.calculate_rmse(rmse_average, n_particles, time_step=self.h, calc_particles=True)
@@ -225,11 +187,10 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
             coefficient, rmse_nparticles_analysis, min, max = self.rmse_analysis(rmse_num_particles)
 
-            label = '{a} * Np ^ (-{b})'.format(a=round(coefficient[0],4), b=round(coefficient[1],4))
+            label = '{a} * Np ^ ({b})'.format(a=round(coefficient[0],4), b=round(-coefficient[1],4))
 
             self.plot_rmse_analysis(axes=rmse_axes[0],xlim=[self.Np_list[0]- 100,self.Np_list[-1] + 100], xlabel='Number of particles', ylabel='RMSE',label=label,
                                     title=title,observed_data=rmse_num_particles, fitted_data=rmse_nparticles_analysis, diff_nparticles=True)
-            
             
             for time_step in self.time_step_list:
 
@@ -253,27 +214,9 @@ class TaskB(InitialState,SimulationMath,Concentration):
 
             coefficient, rmse_time_step_analysis, min, max = self.rmse_analysis(rmse_time_step)
 
-            label = '{a} * h ^ (-{b})'.format(a=round(coefficient[0],4), b=round(coefficient[1],4))
+            label = '{a} * h ^ ({b})'.format(a=round(coefficient[0],4), b=round(-coefficient[1],4))
 
             self.plot_rmse_analysis(axes=rmse_axes[1],xlim=[1e-5,1],ylim=[min, max],title=title,xlabel='Time Step (s)',ylabel='RMSE',label=label,
                                     observed_data=rmse_time_step, fitted_data=rmse_time_step_analysis, diff_timestep=True)
 
-            plt.show()
-
-    def rmse_analysis(self,rmse_data):
-
-        rmse_data = np.array(rmse_data)
-
-        x = rmse_data[:,0]
-        y = rmse_data[:,1]
-        popt, pcov = curve_fit(lambda fx,a,b: a*fx**-b,  x,  y)
-        power_y = popt[0]*x**-popt[1]
-        
-        rmse_list = list(zip(x,power_y))
-
-        rmse_array = np.array(rmse_list)
-
-        min = np.min(rmse_array[:,1])
-        max = np.max(rmse_array[:,1])
-
-        return popt, rmse_list, min, max
+        plt.show()

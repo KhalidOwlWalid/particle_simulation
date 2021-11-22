@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from globals import Globals
-from simulation_math import SimulationMath
 
 class InitialState(Globals):
 

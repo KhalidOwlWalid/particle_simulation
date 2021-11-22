@@ -7,18 +7,16 @@ import time
 from scipy.spatial import cKDTree
 
 from simulation_math import SimulationMath
-from initial_state import InitialState
-from concentration import Concentration
 
 
-class TaskA(InitialState,SimulationMath,Concentration):
+class TaskA(SimulationMath):
 
     def __init__(self):
         super().__init__()
         self.substance = {"sub_1": [], "sub_2": []}
         self.substance_list = ["sub_2", "sub_1"]
 
-        self.field_coordinates, self.vector_field_data = self.read_data_file('data_file/velocityCMM3.dat', [0,1], [2,3])
+        self.field_coordinates, self.vector_field_data = self.read_data_file('velocityCMM3.dat', [0,1], [2,3])
         self.spatial_field = cKDTree(self.field_coordinates)
 
         
@@ -108,7 +106,7 @@ class TaskA(InitialState,SimulationMath,Concentration):
 
         heatmap = axes.imshow(grid, extent=(self.xMin, self.xMax, self.yMin, self.yMax))
 
-        axes.set_title('Concentration Plot for time {num}'.format(num=self.tEnd))
+        axes.set_title('Concentration Plot for time {num} \n with time step {h}'.format(num=self.tEnd, h = self.h))
         axes.set_xlabel('x')
         axes.set_ylabel('y')
 
@@ -132,8 +130,9 @@ class TaskA(InitialState,SimulationMath,Concentration):
         print("[INFO] Running the simulation...")
         self.run_simulation()
 
+        if self.plot_2D_particle:
         # print("[INFO] Plotting the solution for time : {solution}".format(solution=self.tEnd))
-        self.plot_solution()
+            self.plot_solution()
         
         concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
 

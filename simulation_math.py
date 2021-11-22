@@ -3,9 +3,13 @@ import math
 from scipy import interpolate
 from scipy.spatial import cKDTree
 
-from globals import Globals
+from sklearn.metrics import mean_squared_error
+from scipy.optimize import curve_fit
 
-class SimulationMath(Globals):
+from initial_state import InitialState
+from concentration import Concentration
+
+class SimulationMath(InitialState, Concentration):
 
     def __init__(self):
         super().__init__()
@@ -19,7 +23,7 @@ class SimulationMath(Globals):
 
         n_line = 0
             
-        if file == "data_file/reference_solution_1D.dat":
+        if file == "reference_solution_1D.dat":
 
             for line in open(file , 'r'):
                 
@@ -30,7 +34,6 @@ class SimulationMath(Globals):
                     data.append((float(lines[0]), float(lines[1])))
 
         print("[INFO] Extracting data from {name}".format(name=file))
-        print("[INFO] There is {num} empty lines".format(num=n_line))
 
         return data
 
@@ -43,4 +46,52 @@ class SimulationMath(Globals):
         random = self.generate_random_number(array_size)
 
         return coordinate + velocity * time_step + np.sqrt(2 * self.D) * np.sqrt(time_step) * random
+
+    def calculate_rmse(self,rmse_average_list, n_particles, time_step, calc_particles=False, calc_time_step=False):
+        
+        x_grid = np.linspace(-1,1,self.Nx)
+
+        self.substance = {"sub_1": [], "sub_2": []}
+
+        self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state(n_particles)
+
+        self.run_simulation(time_step)
+
+        concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
+
+        concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
+
+        observed_data = np.array(*[concentration_list])
+        reference_solution = np.array(*[self.ref_sol])
+
+        actual_concentration = observed_data[:,1]
+        predicted_concentration = np.interp(observed_data[:,0], reference_solution[:,0], reference_solution[:,1])
+
+        if calc_particles:
+            RMSE = mean_squared_error(predicted_concentration, actual_concentration, squared=False)
+            rmse_average_list.append((n_particles, RMSE))
+        if calc_time_step:
+            RMSE = mean_squared_error(predicted_concentration, actual_concentration, squared=False)
+            rmse_average_list.append((time_step, RMSE))
+            
+
+        return rmse_average_list
+
+    def rmse_analysis(self,rmse_data):
+
+        rmse_data = np.array(rmse_data)
+
+        x = rmse_data[:,0]
+        y = rmse_data[:,1]
+        popt, pcov = curve_fit(lambda fx,a,b: a*fx**-b,  x,  y)
+        power_y = popt[0]*x**-popt[1]
+        
+        rmse_list = list(zip(x,power_y))
+
+        rmse_array = np.array(rmse_list)
+
+        min = np.min(rmse_array[:,1])
+        max = np.max(rmse_array[:,1])
+
+        return popt, rmse_list, min, max
 
