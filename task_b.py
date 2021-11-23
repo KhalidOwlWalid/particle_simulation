@@ -15,11 +15,15 @@ class TaskB(SimulationMath):
         self.substance = {"sub_1": [], "sub_2": []}
         self.substance_list = ["sub_1", "sub_2"]
 
+        # Sets some variables by default
         self.Ny = 1
+        self.tEnd = 0.2
+
+        # Creates a list of data for the use of our RMSE plots
         self.Np_list = np.arange(1000,200000,10000)
         self.time_step_list = np.linspace(0.1,0.0001,20)
 
-        self.tEnd = 0.2
+        
 
     # Checks if a particle is going outside the boundary
     def boundary_conditions(self, next_pos_x):
@@ -92,6 +96,7 @@ class TaskB(SimulationMath):
             file1.write("{x} {y}\n".format(x=round(element[0], 7), y=element[1])) 
             file1.close()
 
+    # Plots our rmse analysis
     def plot_rmse_analysis(self,axes,xlim,title,xlabel,ylabel,observed_data,fitted_data,label,
                             ylim=None,diff_nparticles=False,diff_timestep=False):
 
@@ -124,6 +129,8 @@ class TaskB(SimulationMath):
 
         self.figure, self.axes = plt.subplots()
 
+        # For our main simulation for task B
+        # PLots the 1D plot
         for i, run in enumerate(plot_dict['label']):
 
             start  = time.process_time()
@@ -154,16 +161,19 @@ class TaskB(SimulationMath):
             print("[INFO] Run {num} Simulation status : Success".format(num=(i+1)))
             print("[INFO] The time taken to complete the simulation for Run {num} is {time}".format(num=(i+1),time=round((time.process_time() - start), 2)))
 
+        # If user wants to see the RMSE plot, they can set this as true in the globals.py
         if self.rmse_plot:
 
             rmse_figure, rmse_axes= plt.subplots(1,2,figsize=(9,9))
             rmse_figure.set_size_inches(13,13)
             
-            n_run = 1
+            # The number of repitions for our RMSE plot for each element
+            n_run = 5
             
             rmse_num_particles = []
             rmse_time_step = []
 
+            # Runs the RMSE calculation and plots for RMSE against Number of particles
             for n_particles in self.Np_list:
 
                 start  = time.process_time()
@@ -172,10 +182,13 @@ class TaskB(SimulationMath):
 
                 for i in range(n_run):
                     
+                    # Get the list of RMSE values for the current element
                     rmse_average = self.calculate_rmse(rmse_average, n_particles, time_step=self.h, calc_particles=True)
 
+                # Change the list to an array
                 rmse_average = np.array(rmse_average)
 
+                # Find the average RMSE
                 rmse_average = np.mean(rmse_average, axis=0)
 
                 rmse_num_particles.append((rmse_average[0], rmse_average[1]))
@@ -184,13 +197,16 @@ class TaskB(SimulationMath):
 
             title = 'RMSE against Number of particles for h={num}'.format(num=self.h)
 
+            # Perform RMSE analysis and find the fitted curve coefficient value
             coefficient, rmse_nparticles_analysis, min, max = self.rmse_analysis(rmse_num_particles)
 
             label = '{a} * Np ^ ({b})'.format(a=round(coefficient[0],4), b=round(-coefficient[1],4))
 
+            # Plots our rmse analysis
             self.plot_rmse_analysis(axes=rmse_axes[0],xlim=[self.Np_list[0]- 100,self.Np_list[-1] + 100], xlabel='Number of particles', ylabel='RMSE',label=label,
                                     title=title,observed_data=rmse_num_particles, fitted_data=rmse_nparticles_analysis, diff_nparticles=True)
             
+            # Runs the RMSE calculation and plots for RMSE against time steps
             for time_step in self.time_step_list:
 
                 start  = time.process_time()
