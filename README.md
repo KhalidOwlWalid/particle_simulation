@@ -15,6 +15,12 @@
 | `self.grid_size` | Sets the grid size for our concentration plot | `int` | 100 |
 | `self.radius` | Sets the radius of our circle in the simulation | `float` | 0.2 |
 | `self.offset_x` <br /> `self.offset_y` | Sets the offset of the circle from the origin in the simulation | `float` | 0.4, 0.4 |
+| `self.xMin` <br /> `self.xMax` | Sets the boundary condition for x-axis | `float` | -1.0, 1.0 |
+| `self.yMin` <br /> `self.yMax` | Sets the boundary condition for y-axis | `float` | -1.0, 1.0 |
+| `self.D` | Sets the diffusivity of our substance | `float` | 0.1 |
+| `self.include_velocity` | Include the velocity in our simulation | `boolean` | True/False |
+| `self.plot_2D_particle (OPTIONAL)` | Visualize the particle scatter plot | `boolean` | True/False |
+
 
 # Class
 | Class | Description |
