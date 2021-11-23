@@ -8,13 +8,13 @@
 #### List of variables that needs to be set
 | Variables | Description | Type | Options (example) |
 | --------- | ----------- | ---- | ----------------- |
-| self.task | Sets the task for our simulation (Please make sure that it is capitalized) | 'str' | A |
-| self.Np | Sets the number of particles involved in the simulation | 'int' | 150000 |
-| self.h | Sets the time step for our simulation | 'float' | 0.01 |
-| self.tEndd | Sets the time length for our simulation | 'float' | 0.2 |
-| self.grid_size | Sets the grid size for our concentration plot | 'int' | 100 |
-| self.radius | Sets the radius of our circle in the simulation | 'float' | 0.2 |
-| self.offset_x <br /> self.offset_y | Sets the offset of the circle from the origin in the simulation | 'float' | 0.4, 0.4 |
+| `self.task` | Sets the task for our simulation (Please make sure that it is capitalized) | `str` | A |
+| `self.Np` | Sets the number of particles involved in the simulation | `int` | 150000 |
+| `self.h` | Sets the time step for our simulation | `float` | 0.01 |
+| `self.tEnd` | Sets the time length for our simulation | `float` | 0.2 |
+| `self.grid_size` | Sets the grid size for our concentration plot | `int` | 100 |
+| `self.radius` | Sets the radius of our circle in the simulation | `float` | 0.2 |
+| `self.offset_x` <br /> `self.offset_y` | Sets the offset of the circle from the origin in the simulation | `float` | 0.4, 0.4 |
 
 # Class
 | Class | Description |
