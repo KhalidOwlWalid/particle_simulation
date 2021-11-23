@@ -5,10 +5,17 @@ from globals import Globals
 
 """
 This file is responsible in handling the initial state of our simulations
+
 """
 
 
 class InitialState(Globals):
+    """
+    This class is responsible in constructing the intial state of our simulations
+
+    taskA_initial_state : Will add a circle to our plot of specified radius and offsets by the user
+    taskB_initial_state : Adds a rectangle that is seperated by the x = 0 axis.
+    """
 
     def __init__(self):
         

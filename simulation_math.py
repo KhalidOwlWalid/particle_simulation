@@ -7,7 +7,15 @@ from initial_state import InitialState
 from concentration import Concentration
 
 """
-This file is implements the mathematics and physics related to the fluid simulation
+This file  implements the mathematics and physics related to the fluid simulation
+
+It is capable of performing analysis for our simulation such as the RMSE error analysis
+
+Function: 
+    self.euler : Perform the euler method for our arrays of coordinates
+    self.calculate_rmse : Calculates the RMSE value for each elements for different parameters and returns
+                          a list of tuples (parameter, RMSE) to be plot
+    self.rmse_analysis : Find the best fit curve for our task B RMSE analysis
 """
 
 class SimulationMath(InitialState, Concentration):

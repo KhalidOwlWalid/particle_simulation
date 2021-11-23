@@ -5,6 +5,7 @@ import numpy as np
 import time
 
 from task_a import TaskA
+
 """
 This file handles all the task D problems.
 

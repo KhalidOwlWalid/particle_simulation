@@ -7,8 +7,18 @@ from scipy.spatial import cKDTree
 
 from simulation_math import SimulationMath
 
-class TaskB(SimulationMath):
+"""
+This file is responsible in handling all task B simulations
+"""
 
+class TaskB(SimulationMath):
+    """
+    This class is capable of running the simulation for a 1D concentration against x coordinate.
+
+    It is also capable in calculating the RMSE value of each x_coordinate points with respect to the reference solution.
+
+    If the user wants to visualize the RMSE error plots, self.rmse_plot needs to be set to True.
+    """
     def __init__(self):
         super().__init__()
 
@@ -89,9 +99,10 @@ class TaskB(SimulationMath):
         print("[INFO] Creating concentration plot...")
         sns.heatmap(grid, cmap='RdBu')
 
+    # This function allows you to extract data from the simulation
     def save_to_txt(self,array, filename):
 
-        for element in array: #you wouldn't need to write this since you are already in a loop
+        for element in array: 
             file1 = open(filename,"a") 
             file1.write("{x} {y}\n".format(x=round(element[0], 7), y=element[1])) 
             file1.close()
@@ -116,6 +127,9 @@ class TaskB(SimulationMath):
             axes.set_ylim(ylim)
 
     def main(self):
+        """
+        This is the main function where the simulation runs.
+        """
 
         file = 'reference_solution_1D.dat'
         self.ref_sol= self.extract_data(file)
@@ -137,20 +151,24 @@ class TaskB(SimulationMath):
 
             self.substance = {"sub_1": [], "sub_2": []}
 
-            # Here you can choose to switch between task A and task B initial state
+            # Initialized the particle's position as a task B initial state and assigned the coordinates of the particle to its respective substance
             self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state(self.Np)
 
+            # Runs the simulation
             self.run_simulation(time_step=self.h)
 
+            # Calculate teh concentration for each grid
             concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
 
             x_grid = np.linspace(-1,1,self.Nx)
 
+            # Assigned the x coordinate with its respective concentration
             concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
 
             if i == 0:
                 self.axes.plot(*zip(*self.ref_sol), color="red", label='Reference Solution')
             
+            # Plots the data we obtain from the simulation
             self.axes.plot(*zip(*concentration_list),plot_dict['marker'][i], color=plot_dict['color'][i], markersize=3, label='Run 1')
             self.axes.legend()
 
@@ -163,7 +181,7 @@ class TaskB(SimulationMath):
 
         # If user wants to see the RMSE plot, they can set this as true in the globals.py
         if self.rmse_plot:
-
+                
             rmse_figure, rmse_axes= plt.subplots(1,2,figsize=(9,9))
             rmse_figure.set_size_inches(13,13)
             
