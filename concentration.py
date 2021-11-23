@@ -70,6 +70,8 @@ class Concentration(Globals):
 
             for i in range(self.Nx - 1):
                 grid_list.append([0 for j in range(self.Ny - 1)])
+            
+            print("[INFO] Checking each grid for particles...")
 
             for i in range(len(self.x_grid)- 1):
                 for j in range(len(self.y_grid) - 1):
@@ -92,6 +94,7 @@ class Concentration(Globals):
                                 grid_list[j][i] = concentration
                             else:
                                 grid_list[j][i] = 0
+
                         except:
                             pass
 
@@ -146,3 +149,33 @@ class Concentration(Globals):
             concentration_plot.append((avg_x, concentration))
                 
         return concentration_plot
+
+    def calculate_concentration_taskE(self,sub_1):
+
+        grid_list = []
+        
+        self.sub_1 = sub_1
+
+        for i in range(self.Nx - 1):
+                grid_list.append([0 for j in range(self.Ny - 1)])
+
+        for i in range(len(self.x_grid)- 1):
+            for j in range(len(self.y_grid) - 1):
+
+                check_inside_grid_x1 = np.logical_and(sub_1[:,0] > self.x_grid[i], sub_1[:,0] < self.x_grid[i+1])
+                check_inside_grid_y1 = np.logical_and(sub_1[:,1] < self.y_grid[j], sub_1[:,1] > self.y_grid[j+1])
+                grid_sub1_count = np.where(np.logical_and(check_inside_grid_x1, check_inside_grid_y1), 1, 0)
+                unique, particle_count = np.unique(grid_sub1_count, return_counts=True)
+
+                if len(particle_count) == 2:
+                        try:
+                            grid_list[j][i] = particle_count[1] /len(sub_1)
+
+                        except:
+                            pass
+                    
+        return np.array(grid_list)
+
+
+
+
