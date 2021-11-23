@@ -17,5 +17,5 @@ if __name__ == '__main__':
         task_B.main()
 
     if globals.getTask() == 2:
-        task_D.main_task_D()
+        task_D.main()
         

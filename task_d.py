@@ -26,14 +26,14 @@ class TaskD(TaskA):
 
         heatmap = axes.imshow(grid, extent=(self.xMin, self.xMax, self.yMin, self.yMax))
 
-        axes.set_title('Chemical Concentration for time {num} \n with time step {h}'.format(num=self.tEnd, h=self.h))
+        axes.set_title('Chemical Concentration for time {num}s \n with time step {h}s'.format(num=self.tEnd, h=self.h))
         axes.set_xlabel('x')
         axes.set_ylabel('y')
 
         heatmap.set_cmap('brg')
         figure.colorbar(matplotlib.cm.ScalarMappable(cmap='brg'))
 
-    def main_task_D(self):
+    def main(self):
 
         start = time.process_time()
 

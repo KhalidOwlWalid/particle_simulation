@@ -148,7 +148,7 @@ class TaskB(SimulationMath):
                 self.axes.plot(*zip(*concentration_list),plot_dict['marker'][i], color=plot_dict['color'][i], markersize=3, label='Run 1')
                 self.axes.legend()
 
-                self.axes.set_title('1D Diffusion Problem')
+                self.axes.set_title('1D Diffusion Problem for {num1} particles \n with time step {time}'.format(num1=self.Np, time=self.h))
                 self.axes.set_xlabel('x')
                 self.axes.set_ylabel('Concentration')
 

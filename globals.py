@@ -14,7 +14,7 @@ class Globals:
         OPTION : A, B, D
         """
         self.task_type = {'A':0, 'B':1, 'D':2}
-        self.task = 'A'
+        self.task = 'D'
 
         #######################
         # Number of particles #
@@ -39,7 +39,7 @@ class Globals:
         INFO : For h = 0.001 with 100 grids and 150000 particles, it takes 600 seconds to plot
         """
         self.h = 0.001
-        self.tEnd = 0.175
+        self.tEnd = 0.5
 
         #########
         # Grids #
@@ -73,7 +73,7 @@ class Globals:
         ########################
         # Diffusivity (Task A) #
         ########################
-        self.D = 0.1
+        self.D = 1
         
         ####################
         # Velocity (Task A)#
@@ -98,7 +98,7 @@ class Globals:
         True : Gives 1D plot of concentration vs x coordinate
         False : Does not plot 1D plot
         """
-        self.plot_1D = False
+        self.plot_1D = True
 
         """
         True : Plots the RMSE vs parameter (number of particles and different time step)

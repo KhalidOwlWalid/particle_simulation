@@ -48,6 +48,10 @@ class TaskA(SimulationMath):
 
         for step in range(self.steps):
             if self.include_velocity:
+
+                if self.debug:
+                    print("[DEBUG] Calculating for timme : {time}".format(time=(step * self.h)))
+
                 for i, sub_type in enumerate(self.substance_list):
                     
                     unknown, self.index = self.spatial_field.query(np.array(self.substance[sub_type]))
@@ -57,6 +61,9 @@ class TaskA(SimulationMath):
                     self.substance[sub_type][:,1] = self.euler(self.substance[sub_type][:,1],  velocity=self.interpolated_velocities[:,1], array_size=len(self.substance[sub_type][:,1]), time_step=self.h)
 
             else:
+                if self.debug:
+                    print("[DEBUG] Calculating for timme : {time}".format(time=(step * self.h)))
+
                 for i, sub_type in enumerate(self.substance_list):
 
                     unknown, self.index = self.spatial_field.query(np.array(self.substance[sub_type]))
@@ -96,6 +103,7 @@ class TaskA(SimulationMath):
                 self.axes.set_ybound(lower=self.yMin, upper=self.yMax)
                 self.axes.set_ylim(ymin=self.yMin, ymax=self.yMax)
                 self.axes.scatter(*zip(*self.substance[sub_type]), s=self.size, c=color)
+                self.axes.set_title('Particle 2D plots for {num1} particles \n and time step {num2}'.format(num1=self.Np, num2=self.h))
 
     
     # This produces a pixelated concentration plot
