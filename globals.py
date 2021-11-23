@@ -29,7 +29,7 @@ class Globals:
         self.task_type = {'A':0, 'B':1, 'D':2, 'E':3}
 
         # Change task here
-        self.task = 'B'
+        self.task = 'A'
 
         #######################
         # Number of particles #
@@ -65,7 +65,7 @@ class Globals:
         """
 
         # Change your grid size here
-        self.grid_size = 40
+        self.grid_size = 100
 
         # Our grids need to be symmetrical, but for task B, Ny is set to 1 by default
         self.Nx = self.grid_size
@@ -82,8 +82,8 @@ class Globals:
         self.radius = 0.2
 
         # Set your circle offsets from the origin here
-        self.offset_x = 0.3
-        self.offset_y = -0.2
+        self.offset_x = 0.4
+        self.offset_y = 0.4
         
         ##########
         # Domain #
@@ -127,7 +127,7 @@ class Globals:
         """
 
         # Do you want your simulation to include velocity?
-        self.include_velocity = False
+        self.include_velocity = True
         
         ############################
         # Plot settings (OPTIONAL) #
@@ -138,7 +138,7 @@ class Globals:
         """
         
         # Do you want to visualize the scatter plot of our simulation?
-        self.plot_2D_particle = True
+        self.plot_2D_particle = False
         self.size = 5
         
         #############################
@@ -152,7 +152,7 @@ class Globals:
             True : Plots the RMSE vs parameter (number of particles and different time step)
             False : No plot
         """
-        self.rmse_plot = True
+        self.rmse_plot = False
         
         #########
         # Debug #
