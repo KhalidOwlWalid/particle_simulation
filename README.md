@@ -45,7 +45,7 @@
 #### List of variables that needs to be set
 | Variables | Description | Type | Options (example) |
 | --------- | ----------- | ---- | ----------------- |
-| `self.task` | Sets the task for our simulation (Please make sure that it is capitalized) | `str` | A |
+| `self.task` | Sets the task for our simulation (Please make sure that it is capitalized) | `str` | D |
 | `self.Np` | Sets the number of particles involved in the simulation | `int` | 150000 |
 | `self.h` | Sets the time step for our simulation | `float` | 0.01 |
 | `self.tEnd` | Sets the time length for our simulation | `float` | 0.2 |
@@ -54,7 +54,7 @@
 By default, `self.offset_x, self.offset_y, self.radius, self.D, self.include_velocity` has already been locally set inside 'task_d.py`
 
 ## Task E
-- Can have the same configuration as task A
+- Can have the same configuration as task A but `self.task = 'E'`
 
 NOTE : Set `self.debug` to `True` if you want to see what is generally going on with the simulation
 
