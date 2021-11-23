@@ -1,6 +1,4 @@
 import matplotlib.pyplot as plt
-import seaborn as sns
-import matplotlib.colors
 import numpy as np
 import time
 from scipy.spatial import cKDTree
@@ -181,7 +179,7 @@ class TaskB(SimulationMath):
 
         # If user wants to see the RMSE plot, they can set this as true in the globals.py
         if self.rmse_plot:
-                
+
             rmse_figure, rmse_axes= plt.subplots(1,2,figsize=(9,9))
             rmse_figure.set_size_inches(13,13)
             

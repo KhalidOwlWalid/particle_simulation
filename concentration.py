@@ -1,3 +1,8 @@
+
+import numpy as np
+
+from globals import Globals
+
 """
 This file handles all the concentration problem. 
 
@@ -7,9 +12,6 @@ calculate_concentration_taskE : Optimized method
 
 """
 
-import numpy as np
-
-from globals import Globals
 
 class Concentration(Globals):
 

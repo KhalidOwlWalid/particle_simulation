@@ -1,6 +1,5 @@
 # Add comment
 import matplotlib.pyplot as plt
-import seaborn as sns
 import matplotlib.colors
 import numpy as np
 import time
