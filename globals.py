@@ -152,6 +152,7 @@ class Globals:
             True : Plots the RMSE vs parameter (number of particles and different time step)
             False : No plot
         """
+        # OPTIONAL
         self.rmse_plot = False
         
         #########
