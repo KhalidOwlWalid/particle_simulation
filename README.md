@@ -1,8 +1,8 @@
 # Paricle Simulation
 
 ## Running the simulation
-- Set your desired input in the 'globals.py' file 
-- Run the simulation in 'main.py'
+- Set your desired input in the `globals.py` file 
+- Run the simulation in `main.py`
 
 # Class
 | Class | Description |
