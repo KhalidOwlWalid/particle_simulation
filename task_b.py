@@ -121,41 +121,40 @@ class TaskB(SimulationMath):
                      'color':['blue', 'green', 'cyan']}
         plot_test = []
 
-        if self.plot_1D == True:
 
-            self.figure, self.axes = plt.subplots()
+        self.figure, self.axes = plt.subplots()
 
-            for i, run in enumerate(plot_dict['label']):
+        for i, run in enumerate(plot_dict['label']):
 
-                start  = time.process_time()
+            start  = time.process_time()
 
-                self.substance = {"sub_1": [], "sub_2": []}
+            self.substance = {"sub_1": [], "sub_2": []}
 
-                # Here you can choose to switch between task A and task B initial state
-                self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state(self.Np)
-    
-                self.run_simulation(time_step=self.h)
+            # Here you can choose to switch between task A and task B initial state
+            self.substance["sub_1"], self.substance["sub_2"] = self.taskB_initial_state(self.Np)
 
-                concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
+            self.run_simulation(time_step=self.h)
 
-                x_grid = np.linspace(-1,1,self.Nx)
+            concentration_grid = self.calculate_concentration(self.substance["sub_1"],self.substance["sub_2"])
 
-                concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
+            x_grid = np.linspace(-1,1,self.Nx)
 
-                if i == 0:
-                    self.axes.plot(*zip(*self.ref_sol), color="red", label='Reference Solution')
-                
-                self.axes.plot(*zip(*concentration_list),plot_dict['marker'][i], color=plot_dict['color'][i], markersize=3, label='Run 1')
-                self.axes.legend()
+            concentration_list = self.assign_concentration(self.substance["sub_1"],self.substance["sub_2"], concentration_grid[0], x_grid)
 
-                self.axes.set_title('1D Diffusion Problem for {num1} particles \n with time step {time}'.format(num1=self.Np, time=self.h))
-                self.axes.set_xlabel('x')
-                self.axes.set_ylabel('Concentration')
+            if i == 0:
+                self.axes.plot(*zip(*self.ref_sol), color="red", label='Reference Solution')
+            
+            self.axes.plot(*zip(*concentration_list),plot_dict['marker'][i], color=plot_dict['color'][i], markersize=3, label='Run 1')
+            self.axes.legend()
 
-                print("[INFO] Run {num} Simulation status : Success".format(num=(i+1)))
-                print("[INFO] The time taken to complete the simulation for Run {num} is {time}".format(num=(i+1),time=round((time.process_time() - start), 2)))
+            self.axes.set_title('1D Diffusion Problem for {num1} particles \n with time step {time}'.format(num1=self.Np, time=self.h))
+            self.axes.set_xlabel('x')
+            self.axes.set_ylabel('Concentration')
 
-        if self.rmse_plot == True:
+            print("[INFO] Run {num} Simulation status : Success".format(num=(i+1)))
+            print("[INFO] The time taken to complete the simulation for Run {num} is {time}".format(num=(i+1),time=round((time.process_time() - start), 2)))
+
+        if self.rmse_plot:
 
             rmse_figure, rmse_axes= plt.subplots(1,2,figsize=(9,9))
             rmse_figure.set_size_inches(13,13)
