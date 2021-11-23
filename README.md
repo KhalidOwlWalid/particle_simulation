@@ -7,6 +7,7 @@
 ### Task A
 #### List of variables that needs to be set
 | Variables | Description | Type | Options (example) |
+| --------- | ----------- | ---- | ----------------- |
 | self.task | Sets the task for our simulation (Please make sure that it is capitalized) | 'str' | A |
 | self.Np | Sets the number of particles involved in the simulation | 'int' | 150000 |
 | self.h | Sets the time step for our simulation | 'float' | 0.01 |
