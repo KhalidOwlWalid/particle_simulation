@@ -1,4 +1,4 @@
-# Paricle Simulation
+# Particle Simulation
 
 ## Running the simulation
 - Set your desired input in the `globals.py` file 
